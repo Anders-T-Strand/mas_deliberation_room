@@ -1,0 +1,63 @@
+# Current Marketing Strategy - B2B SaaS
+
+## Business Overview
+- **Industry**: B2B SaaS (Enterprise Software)
+- **Target Audience**: Mid-market to Enterprise (500-5000 employees)
+- **Average Deal Size**: $15,000
+- **Sales Cycle**: 40-45 days
+- **Current MRR**: $1.6M
+- **Annual Churn Rate**: ~20%
+
+## Current Marketing Mix
+
+### 1. Content Marketing & SEO (35% of budget)
+- **Blog Posts**: 8-10 per month
+- **Whitepapers/Ebooks**: 2 per quarter
+- **Webinars**: 3 per month
+- **Organic Traffic**: 45,000 monthly visitors
+- **MQL Conversion**: 3.2%
+
+### 2. Paid Search & LinkedIn Ads (40% of budget)
+- **Google Ads Focus**: High-intent keywords
+- **LinkedIn Campaign Types**: Sponsored content, InMail
+- **Average CPL**: $226
+- **MQL to SQL Rate**: 29%
+
+### 3. Sales Enablement (15% of budget)
+- **Sales Collateral**: Case studies, battle cards, demos
+- **Sales Team Size**: 15 reps
+- **SDR Team**: 8 reps
+- **Average Calls per Rep**: 50/day
+
+### 4. Events & Partnerships (10% of budget)
+- **Trade Shows**: 4 per year
+- **Virtual Events**: Monthly
+- **Partner Program**: 25 active partners
+- **Partner-sourced Leads**: 15% of pipeline
+
+## Current Challenges
+1. **Long Sales Cycles**: 40-45 days average
+2. **High CAC**: $8,500 per customer
+3. **SQL to Opportunity Conversion**: Only 67%
+4. **Marketing-Sales Alignment**: Lead quality concerns
+
+## Key Metrics
+- **Monthly Marketing Spend**: ~$37,000
+- **Monthly Sales Spend**: ~$52,000
+- **MQLs per Month**: 160-170
+- **SQLs per Month**: 48-52
+- **Closed Won per Month**: 10-11
+
+## Lead Sources
+- **Inbound Marketing**: 40%
+- **Outbound Sales**: 35%
+- **Partners**: 15%
+- **Events**: 10%
+
+## Opportunities Identified
+1. Account-Based Marketing (ABM) implementation
+2. Customer advocacy program
+3. Podcast sponsorships in relevant industries
+4. Interactive product demos
+5. Expansion into new verticals (Healthcare, Financial Services)
+6. Marketing automation optimization

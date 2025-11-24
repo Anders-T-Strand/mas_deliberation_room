@@ -1,0 +1,66 @@
+# Current Marketing Strategy - Local Services
+
+## Business Overview
+- **Industry**: Local Home Services (Plumbing, HVAC, Electrical)
+- **Service Area**: 25-mile radius, suburban market
+- **Average Ticket**: $285
+- **Customer Base**: 80% residential, 20% commercial
+- **Daily Service Calls**: 45-50
+
+## Current Marketing Mix
+
+### 1. Google Ads (70% of budget)
+- **Daily Spend**: $1,200-1,500
+- **Focus Keywords**: "emergency plumber near me", "AC repair", "electrician"
+- **Average CPC**: $10.00
+- **Conversion Rate**: 12%
+- **Call-Only Campaigns**: 60% of spend
+
+### 2. SEO & Google My Business (15% of budget)
+- **GMB Reviews**: 4.7 stars (850 reviews)
+- **Local Pack Rankings**: Top 3 for main keywords
+- **Website Traffic**: 8,000 monthly visitors
+- **Organic Conversions**: 25% of leads
+
+### 3. Traditional Marketing (10% of budget)
+- **Direct Mail**: Quarterly to 10,000 homes
+- **Vehicle Wraps**: 15 service vehicles
+- **Local Sponsorships**: Youth sports teams
+
+### 4. Customer Retention (5% of budget)
+- **Service Agreements**: 450 active
+- **Email Reminders**: Seasonal maintenance
+- **Loyalty Discounts**: Repeat customer program
+
+## Current Challenges
+1. **Seasonal Fluctuations**: 40% revenue drop in spring/fall
+2. **Competition**: 15+ competitors in service area
+3. **Tech Adoption**: Limited online booking usage
+4. **Emergency vs Scheduled**: 25/75 split (want more scheduled)
+
+## Key Metrics
+- **Monthly Marketing Spend**: $38,000
+- **Cost per Acquisition**: $80
+- **Customer Retention Rate**: 73%
+- **Repeat Customer Rate**: 40%
+- **Average Response Time**: 2.4 hours
+
+## Lead Sources
+- **Google Ads**: 45%
+- **Organic/GMB**: 25%
+- **Repeat Customers**: 20%
+- **Referrals**: 10%
+
+## Service Mix
+- **Plumbing**: 40%
+- **HVAC**: 35%
+- **Electrical**: 25%
+
+## Opportunities Identified
+1. Facebook/Nextdoor advertising for community presence
+2. SMS appointment reminders and marketing
+3. Online scheduling system implementation
+4. Preventive maintenance membership program
+5. Video content for DIY tips (build trust)
+6. Strategic partnerships with real estate agents
+7. Customer referral incentive program

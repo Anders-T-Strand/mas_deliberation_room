@@ -1,0 +1,10 @@
+crewai
+crewai_tools
+anthropic
+google-generativeai
+openai
+google-genai
+python-dotenv
+pandas
+seaborn
+matplotlib

@@ -1,0 +1,54 @@
+# Current Marketing Strategy - Fashion Ecommerce
+
+## Business Overview
+- **Industry**: Fashion Ecommerce
+- **Target Audience**: Women 25-45, urban professionals, fashion-conscious
+- **Average Order Value**: $162.50
+- **Customer Lifetime Value**: $488.00
+- **Current Monthly Revenue**: ~$1.5M
+
+## Current Marketing Mix
+
+### 1. Instagram Marketing (60% of budget)
+- **Daily Spend**: $500-650
+- **Content Strategy**: 
+  - 15-25 posts per day
+  - Mix of product shots, lifestyle content, user-generated content
+  - Stories featuring behind-the-scenes and flash sales
+- **Engagement Rate**: 4.2% average
+- **Follower Growth**: ~2,000/month
+- **Conversion Rate**: 3.0-3.3%
+
+### 2. Google Ads (25% of budget)
+- **Focus**: Shopping campaigns and branded search
+- **Average CPC**: $2.15
+- **Conversion Rate**: 2.8%
+
+### 3. Email Marketing (10% of budget)
+- **List Size**: 45,000 subscribers
+- **Send Frequency**: 3x per week
+- **Open Rate**: 22%
+- **Click Rate**: 3.5%
+
+### 4. Influencer Partnerships (5% of budget)
+- **Micro-influencers**: 10-15 per month
+- **Engagement focus**: Unboxing videos, outfit posts
+
+## Current Challenges
+1. **High CAC**: $65-70 per customer vs $488 LTV
+2. **Seasonal Revenue Fluctuations**: 30% variance month-to-month
+3. **Low Repeat Purchase Rate**: Only 40% of customers make second purchase
+4. **Instagram Algorithm Changes**: Declining organic reach
+
+## Key Metrics
+- **Monthly Marketing Spend**: ~$580,000
+- **Overall ROAS**: 2.6x
+- **New vs Returning Customer Split**: 60/40
+- **Mobile Traffic**: 75%
+
+## Opportunities Identified
+1. TikTok expansion (currently not utilized)
+2. SMS marketing implementation
+3. Loyalty program enhancement
+4. Pinterest advertising for discovery
+5. Personalization engine for email/site

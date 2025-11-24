@@ -1,0 +1,4 @@
+User name is John Doe.
+User is marketing analyst.
+User is interested in marketing strategies.
+User is based in Denton, Texas.
