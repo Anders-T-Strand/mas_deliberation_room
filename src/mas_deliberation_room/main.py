@@ -22,11 +22,17 @@ from mas_deliberation_room.crew import MasDeliberationRoom
 # Create output directory
 os.makedirs('output', exist_ok=True)
 
+# Default dataset/strategy locations so tests don't need to pass paths
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
+DEFAULT_STRATEGY_FILE = PROJECT_ROOT / "datasets" / "ecommerce_fashion_strategy.txt"
+DEFAULT_DATA_FILE = PROJECT_ROOT / "datasets" / "ecommerce_fashion.csv"
+
+
 warnings.filterwarnings("ignore", category=SyntaxWarning, module="pysbd")
 
-def read_strategy_file(file_path):
+def read_strategy_file(file_path=DEFAULT_STRATEGY_FILE):
     
-    file_path = Path(r"C:\Users\ander\OneDrive\Documents\UNT Classes\Gen AI\Semester project\datasets\ecommerce_fashion_context.txt")
+    file_path = Path(file_path)
     
     if not file_path.exists():
         raise FileNotFoundError(f"Strategy file not found: {file_path}")
@@ -57,9 +63,9 @@ def read_strategy_file(file_path):
         raise ValueError(f"Unsupported file format: {file_path.suffix}. Use .txt, .md, or .docx")
 
 
-def read_csv_data(file_path):
+def read_csv_data(file_path=DEFAULT_DATA_FILE):
    
-    file_path = Path(r"C:\Users\ander\OneDrive\Documents\UNT Classes\Gen AI\Semester project\datasets\ecommerce_fashion.csv")
+    file_path = Path(file_path)
     
     if not file_path.exists():
         raise FileNotFoundError(f"CSV file not found: {file_path}")
@@ -147,7 +153,7 @@ def run_interactive():
     print("Supported formats: .txt, .md, .docx")
     print()
     
-    strategy_file = input("Enter path to strategy file: ").strip()
+    strategy_file = input("Enter path to strategy file (press Enter for default): ").strip() or DEFAULT_STRATEGY_FILE
     
     try:
         strategy_content = read_strategy_file(strategy_file)
@@ -164,7 +170,7 @@ def run_interactive():
     print("Please provide your performance data CSV file")
     print()
     
-    data_file = input("Enter path to CSV data file: ").strip()
+    data_file = input("Enter path to CSV data file (press Enter for default): ").strip() or DEFAULT_DATA_FILE
     
     try:
         data_info = read_csv_data(data_file)
@@ -244,93 +250,112 @@ def run_interactive():
 
 
 
-def run_with_files(strategy_file, data_file, industry=None, target_audience=None):
+def run_with_files(
+    strategy_file=None,
+    data_file=None,
+    industry="E-commerce",
+    target_audience="Women 25-45",
+    mode: str = "multi",
+):
+    strategy_file = Path(strategy_file or DEFAULT_STRATEGY_FILE)
+    data_file = Path(data_file or DEFAULT_DATA_FILE)
+    mode = (mode or "multi").lower()
+    if mode not in {"single", "multi", "both"}:
+        raise ValueError("mode must be one of: single, multi, both")
 
-    print("="*60)
-    print("AI MARKETING STRATEGY BOARD MEETING")
-    print("="*60)
-    print()
-    
-    # Load strategy
-    print(f"Loading strategy from: {strategy_file}")
-    strategy_content = read_strategy_file(strategy_file)
-    print(f"âœ“ Loaded {len(strategy_content)} characters\n")
-    
-    # Load data
-    print(f"Loading data from: {data_file}")
-    data_info = read_csv_data(data_file)
-    print(f"âœ“ Loaded {data_info['summary']['total_rows']} rows\n")
-    sales_data_summary = format_data_summary(data_info)
-    
-    # Prepare inputs
-    inputs = {
-        'module_name': 'marketing_strategy_report.md',
-        'current_strategy': strategy_content,
-        'industry': industry or "General",
-        'target_audience': target_audience or "General audience",
-        'sales_data': sales_data_summary
-    }
-    
-    # Run analysis
-    print("🤖 Starting AI analysis...\n")
-    try:
-        # Create crew
-        crew = MasDeliberationRoom().crew()
+    def _run_selected(selected_mode: str):
+        print(f"\n=== Running in {selected_mode.upper()} mode ===")
+        print("="*60)
+        print("AI MARKETING STRATEGY BOARD MEETING")
+        print("="*60)
+        print()
+        
+        # Load strategy
+        print(f"Loading strategy from: {strategy_file}")
+        strategy_content = read_strategy_file(strategy_file)
+        print(f"Loaded {len(strategy_content)} characters\n")
+        
+        # Load data
+        print(f"Loading data from: {data_file}")
+        data_info = read_csv_data(data_file)
+        print(f"Loaded {data_info['summary']['total_rows']} rows\n")
+        sales_data_summary = format_data_summary(data_info)
+        
+        # Prepare inputs
+        inputs = {
+            'module_name': 'marketing_strategy_report.md',
+            'current_strategy': strategy_content,
+            'industry': industry or "General",
+            'target_audience': target_audience or "General audience",
+            'sales_data': sales_data_summary
+        }
+        
+        # Run analysis
+        print("🤖 Starting AI analysis...\n")
+        try:
+            # Create crew
+            crew_builder = MasDeliberationRoom()
+            crew = crew_builder.single_agent_crew() if selected_mode == "single" else crew_builder.crew()
 
-        # --- TOKEN LIMITER (max 700 tokens per agent) ---
-        for agent in crew.agents:
-            # Works across LLM backends CrewAI wraps; if the LLM object exists, set there too.
-            setattr(agent, "max_tokens", 700)
-            if hasattr(agent, "llm") and hasattr(agent.llm, "max_tokens"):
-                agent.llm.max_tokens = 700
-        print("🔒 Token limit set to 700 per agent\n")
+            # --- TOKEN LIMITER (max 700 tokens per agent) ---
+            for agent in crew.agents:
+                # Works across LLM backends CrewAI wraps; if the LLM object exists, set there too.
+                setattr(agent, "max_tokens", 700)
+                if hasattr(agent, "llm") and hasattr(agent.llm, "max_tokens"):
+                    agent.llm.max_tokens = 700
+            print("🔒 Token limit set to 700 per agent\n")
 
-        # Time the run for evaluation
-        import time
-        _t0 = time.time()
-        result = crew.kickoff(inputs=inputs)
-        exec_time = time.time() - _t0
+            # Time the run for evaluation
+            import time
+            _t0 = time.time()
+            result = crew.kickoff(inputs=inputs)
+            exec_time = time.time() - _t0
 
-        print("\n✅ Analysis complete! Check output/marketing_strategy_report.md")
+            print("\n✅ Analysis complete! Check output/marketing_strategy_report.md")
 
-        # --- EVALUATION ---
-        harness = EvaluationHarness()
-        harness.run_evaluation(
-            crew_result=result,
-            user_inputs=inputs,
-            execution_time=exec_time,
-            test_case_name="manual_run"
-        )
+            # --- EVALUATION ---
+            harness = EvaluationHarness()
+            harness.run_evaluation(
+                crew_result=result,
+                user_inputs=inputs,
+                execution_time=exec_time,
+                test_case_name=f"{selected_mode}_run"
+            )
 
-        # --- VISUALIZATION ---
-        from pathlib import Path as _P
-        if (_P("output") / "experimental_results.json").exists():
-            vg = VisualizationGenerator()
-            vg.generate_all_visualizations()
-        else:
-            print("ℹ️ Skipping visualizations (output/experimental_results.json not found). "
-                "Run your experimental suite first if you want the charts.")
+            # --- VISUALIZATION ---
+            from pathlib import Path as _P
+            if (_P("output") / "experimental_results.json").exists():
+                vg = VisualizationGenerator()
+                vg.generate_all_visualizations()
+            else:
+                print("ℹ️ Skipping visualizations (output/experimental_results.json not found). "
+                    "Run your experimental suite first if you want the charts.")
 
-    except Exception as e:
-        print(f"\n❌ Error during analysis: {e}")
-        raise
+        except Exception as e:
+            print(f"\n❌ Error during analysis in {selected_mode} mode: {e}")
+            raise
+
+    if mode == "both":
+        _run_selected("single")
+        _run_selected("multi")
+    else:
+        _run_selected(mode)
 
 
 
 def run():
     
-    # Check if files provided as command line arguments
     if len(sys.argv) >= 3:
-        # Non-interactive mode
         strategy_file = sys.argv[1]
         data_file = sys.argv[2]
         industry = sys.argv[3] if len(sys.argv) > 3 else None
         target_audience = sys.argv[4] if len(sys.argv) > 4 else None
+        mode = sys.argv[5] if len(sys.argv) > 5 else "multi"
         
-        run_with_files(strategy_file, data_file, industry, target_audience)
+        run_with_files(strategy_file, data_file, industry, target_audience, mode)
     else:
-        # Interactive mode
-        run_interactive()
+        # Allow environment override when no CLI args are provided
+        run_with_files(mode=os.environ.get("MAS_RUN_MODE", "multi"))
 
 
 if __name__ == "__main__":

@@ -1,8 +1,8 @@
 # Evaluation Summary
 
-- **Case**: manual_run
+- **Case**: multi_run
 
-- **When**: 2025-11-29T02:03:15.119625
+- **When**: 2025-11-29T02:09:47.570100
 
 ## Results
 
@@ -14,21 +14,21 @@
   "output_file_generated": false,
   "overall_pass": false,
   "error_log": "",
-  "timestamp": "2025-11-29T02:03:15.118938"
+  "timestamp": "2025-11-29T02:09:47.569092"
 }
 ```
 
 ### performance
 ```json
 {
-  "execution_time_seconds": 21.242425203323364,
+  "execution_time_seconds": 20.25452709197998,
   "total_tokens": 0,
   "tokens_by_type": {
     "prompt_tokens": 0,
     "completion_tokens": 0
   },
   "cost_usd": 0.0,
-  "timestamp": "2025-11-29T02:03:15.118961"
+  "timestamp": "2025-11-29T02:09:47.569121"
 }
 ```
 
