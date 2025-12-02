@@ -254,12 +254,12 @@ def run_with_files(strategy_file, data_file, industry=None, target_audience=None
     # Load strategy
     print(f"Loading strategy from: {strategy_file}")
     strategy_content = read_strategy_file(strategy_file)
-    print(f"âœ“ Loaded {len(strategy_content)} characters\n")
+    print(f" Loaded {len(strategy_content)} characters\n")
     
     # Load data
     print(f"Loading data from: {data_file}")
     data_info = read_csv_data(data_file)
-    print(f"âœ“ Loaded {data_info['summary']['total_rows']} rows\n")
+    print(f"Loaded {data_info['summary']['total_rows']} rows\n")
     sales_data_summary = format_data_summary(data_info)
     
     # Prepare inputs

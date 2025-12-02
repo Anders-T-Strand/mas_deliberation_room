@@ -50,14 +50,22 @@ class MasDeliberationRoom():
         return Task(config=self.tasks_config['marketing_gemini_task'])
 
     @crew
-    def crew(self) -> Crew:
+    def crew(self, agent_mode: str = "multi") -> Crew:
         """Creates the MasDeliberationRoom crew"""
         # To learn how to add knowledge sources to your crew, check out the documentation:
         # https://docs.crewai.com/concepts/knowledge#what-is-knowledge
 
+        selected_agents = self.agents
+        selected_tasks = self.tasks
+
+        # Allow running with only the initial OpenAI analyst for quicker single-agent runs.
+        if agent_mode and agent_mode.lower() == "single":
+            selected_agents = [self.marketing_openai_analyst()]
+            selected_tasks = [self.marketing_openai_task()]
+
         return Crew(
-            agents=self.agents, # Automatically created by the @agent decorator
-            tasks=self.tasks, # Automatically created by the @task decorator
+            agents=selected_agents, # Automatically created by the @agent decorator
+            tasks=selected_tasks, # Automatically created by the @task decorator
             process=Process.sequential,
             verbose=True,
             # process=Process.hierarchical, # In case you wanna use that instead https://docs.crewai.com/how-to/Hierarchical/
