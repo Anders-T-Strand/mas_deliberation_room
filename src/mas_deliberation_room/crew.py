@@ -25,9 +25,9 @@ class MasDeliberationRoom():
     def marketing_openai_analyst(self):
         return Agent(config=self.agents_config['marketing_openai_analyst'])
 
-    # @agent
-    # def marketing_claude_analyst(self):
-    #     return Agent(config=self.agents_config['marketing_claude_analyst'])
+    @agent
+    def marketing_claude_analyst(self):
+        return Agent(config=self.agents_config['marketing_claude_analyst'])
 
     @agent
     def marketing_gemini_analyst(self):
@@ -41,9 +41,9 @@ class MasDeliberationRoom():
     def marketing_openai_task(self) -> Task:
         return Task(config=self.tasks_config['marketing_openai_task'])
 
-    # @task
-    # def marketing_claude_task(self) -> Task:
-    #     return Task(config=self.tasks_config['marketing_claude_task'])
+    @task
+    def marketing_claude_task(self) -> Task:
+        return Task(config=self.tasks_config['marketing_claude_task'])
 
     @task
     def marketing_gemini_task(self) -> Task:
@@ -52,8 +52,20 @@ class MasDeliberationRoom():
     @crew
     def crew(self, agent_mode: str = "multi") -> Crew:
         """Creates the MasDeliberationRoom crew"""
-        # To learn how to add knowledge sources to your crew, check out the documentation:
-        # https://docs.crewai.com/concepts/knowledge#what-is-knowledge
+        # Build agents/tasks based on requested mode to avoid undefined names
+        mode = (agent_mode or "multi").lower()
+        if mode not in {"single", "multi"}:
+            raise ValueError("agent_mode must be 'single' or 'multi'")
+
+        selected_agents = [self.marketing_openai_analyst()]
+        selected_tasks = [self.marketing_openai_task()]
+
+        if mode == "multi":
+            selected_agents.append(self.marketing_claude_analyst())
+            selected_tasks.append(self.marketing_claude_task())
+            selected_agents.append(self.marketing_gemini_analyst())
+            selected_tasks.append(self.marketing_gemini_task())
+
         return Crew(
             agents=selected_agents, # Automatically created by the @agent decorator
             tasks=selected_tasks, # Automatically created by the @task decorator

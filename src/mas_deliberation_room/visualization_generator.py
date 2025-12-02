@@ -1,245 +1,512 @@
 #!/usr/bin/env python
 """
-Visualization Generator for Marketing Strategy System
-Creates charts and comparative analysis visualizations
+Enhanced Visualization Generator for Marketing Strategy System
+Creates comprehensive charts comparing single vs multi-agent runs with diversity metrics.
 """
 
-import pandas as pd
+import matplotlib
+
+# Use a non-interactive backend to avoid Tcl/Tk errors in threaded/CLI runs
+matplotlib.use("Agg")
+
+import json
+from pathlib import Path
+from typing import Dict, List, Optional
 import matplotlib.pyplot as plt
 import seaborn as sns
 import numpy as np
-from pathlib import Path
-import json
+from collections import Counter
 
 # Set style
 sns.set_style("whitegrid")
-plt.rcParams['figure.figsize'] = (10, 6)
-plt.rcParams['font.size'] = 10
+plt.rcParams["figure.figsize"] = (10, 6)
+plt.rcParams["font.size"] = 10
+
+
+class DiversityMetrics:
+    """Calculate diversity metrics for agent outputs."""
+    
+    @staticmethod
+    def calculate_vocabulary_diversity(text1: str, text2: str) -> float:
+        """Calculate vocabulary overlap ratio (lower = more diverse)."""
+        words1 = set(text1.lower().split())
+        words2 = set(text2.lower().split())
+        if not words1 or not words2:
+            return 0.0
+        intersection = len(words1 & words2)
+        union = len(words1 | words2)
+        return 1.0 - (intersection / union) if union > 0 else 0.0
+    
+    @staticmethod
+    def calculate_edit_ratio(original: str, modified: str) -> float:
+        """Estimate how much content changed (simple word-based)."""
+        words_orig = original.lower().split()
+        words_mod = modified.lower().split()
+        if not words_orig:
+            return 1.0
+        
+        # Simple Levenshtein-like ratio at word level
+        common = len(set(words_orig) & set(words_mod))
+        return 1.0 - (common / len(words_orig))
+    
+    @staticmethod
+    def count_strategic_elements(text: str) -> Dict[str, int]:
+        """Count strategic elements in text."""
+        text_lower = text.lower()
+        return {
+            "kpi_mentions": text_lower.count("kpi") + text_lower.count("metric") + text_lower.count("target"),
+            "competitor_mentions": text_lower.count("competitor") + text_lower.count("vs") + text_lower.count("versus"),
+            "tactic_mentions": text_lower.count("tactic") + text_lower.count("strategy") + text_lower.count("campaign"),
+            "budget_mentions": text_lower.count("$") + text_lower.count("budget") + text_lower.count("cost"),
+            "channel_mentions": sum([
+                text_lower.count(ch) for ch in ["instagram", "tiktok", "email", "sms", "google ads", "facebook"]
+            ])
+        }
+
 
 class VisualizationGenerator:
-    """Generate visualizations for experimental results"""
-    
-    def __init__(self, output_dir='output'):
+    """Generate comprehensive visualizations for agent-mode comparisons."""
+
+    def __init__(self, output_dir: str = "output"):
         self.output_dir = Path(output_dir)
         self.output_dir.mkdir(exist_ok=True)
+        self.results_file = self.output_dir / "agent_mode_results.json"
         
-        # Load experimental results
-        with open(self.output_dir / 'experimental_results.json', 'r') as f:
-            self.results = json.load(f)
-    
-    def create_execution_time_chart(self):
-        """Create execution time comparison chart"""
-        scenarios = [r['scenario'].replace('_', ' ').title() for r in self.results]
-        times = [r['execution_time'] for r in self.results]
+        if not self.results_file.exists():
+            raise FileNotFoundError(
+                "agent_mode_results.json not found. Run both single and multi-agent modes first."
+            )
+
+        with open(self.results_file, "r", encoding="utf-8") as f:
+            raw = json.load(f)
+        self.results: List[Dict] = raw if isinstance(raw, list) else []
+        self.latest_by_mode = self._latest_by_mode()
+        self.diversity_calc = DiversityMetrics()
+
+    def _latest_by_mode(self) -> Dict[str, Dict]:
+        """Pick the most recent result per agent_mode."""
+        latest: Dict[str, Dict] = {}
+        for item in self.results:
+            mode = item.get("agent_mode")
+            ts = item.get("timestamp", "")
+            if not mode:
+                continue
+            if mode not in latest or ts > latest[mode].get("timestamp", ""):
+                latest[mode] = item
+        return latest
+
+    def _load_strategy_file(self, filename: str) -> Optional[str]:
+        """
+        Load a strategy output file if it exists (supports .txt or .json with strategy_text).
+        Returns plain string content or None.
+        """
+        path = self.output_dir / filename
+        if path.exists():
+            text = path.read_text(encoding="utf-8")
+            if path.suffix.lower() == ".json":
+                try:
+                    doc = json.loads(text)
+                    if isinstance(doc, dict) and doc.get("strategy_text"):
+                        return doc["strategy_text"]
+                except Exception:
+                    pass
+            return text
+        # Try json fallback for legacy filenames
+        alt_json = path.with_suffix(".json")
+        if not path.suffix and alt_json.exists():
+            try:
+                doc = json.loads(alt_json.read_text(encoding="utf-8"))
+                if isinstance(doc, dict) and doc.get("strategy_text"):
+                    return doc["strategy_text"]
+            except Exception:
+                return None
+        return None
+
+    def create_quality_comparison(self):
+        """Bar chart comparing rubric percent for single vs multi."""
+        data = [
+            (mode.capitalize(), res.get("rubric_percent"))
+            for mode, res in self.latest_by_mode.items()
+            if res.get("rubric_percent") is not None
+        ]
+        if not data:
+            print("⚠️  Skipping quality comparison (no rubric data).")
+            return
+
+        labels, values = zip(*sorted(data))
         
-        plt.figure(figsize=(10, 6))
-        bars = plt.bar(scenarios, times, color=['#2E86AB', '#A23B72', '#F18F01', '#C73E1D', '#6A994E'])
+        fig, ax = plt.subplots(figsize=(8, 6))
+        colors = ["#2E86AB", "#F18F01"]
+        bars = ax.bar(labels, values, color=colors, edgecolor='black', linewidth=1.5)
         
-        plt.title('Execution Time by Scenario', fontsize=14, fontweight='bold')
-        plt.xlabel('Business Scenario', fontsize=12)
-        plt.ylabel('Execution Time (seconds)', fontsize=12)
-        plt.xticks(rotation=45, ha='right')
+        ax.set_ylim(0, 110)
+        ax.set_ylabel("Rubric Score (%)", fontsize=12, fontweight='bold')
+        ax.set_title("Quality Comparison: Single vs Multi-Agent", fontsize=14, fontweight='bold')
+        ax.axhline(y=85, color='green', linestyle='--', alpha=0.5, label='Target: 85%')
         
-        # Add value labels on bars
-        for bar in bars:
+        for bar, val in zip(bars, values):
             height = bar.get_height()
-            plt.text(bar.get_x() + bar.get_width()/2., height,
-                    f'{height:.2f}s',
-                    ha='center', va='bottom', fontsize=9)
+            ax.text(bar.get_x() + bar.get_width() / 2, height + 2, 
+                   f"{val:.1f}%", ha="center", va="bottom", fontsize=11, fontweight='bold')
         
+        ax.legend()
+        ax.grid(axis='y', alpha=0.3)
         plt.tight_layout()
-        plt.savefig(self.output_dir / 'execution_time_comparison.png', dpi=300, bbox_inches='tight')
+        plt.savefig(self.output_dir / "quality_comparison.png", dpi=300, bbox_inches="tight")
         plt.close()
-        print("✓ Created execution_time_comparison.png")
-    
-    def create_data_volume_chart(self):
-        """Create data volume comparison chart"""
-        scenarios = [r['scenario'].replace('_', ' ').title() for r in self.results]
-        data_points = [r['data_points'] for r in self.results]
+        print("✅ Created quality_comparison.png")
+
+    def create_execution_time_chart(self):
+        """Bar chart comparing execution time."""
+        data = [
+            (mode.capitalize(), res.get("execution_time_seconds"))
+            for mode, res in self.latest_by_mode.items()
+            if res.get("execution_time_seconds") is not None
+        ]
+        if not data:
+            print("⚠️  Skipping execution time comparison (no timing data).")
+            return
+
+        labels, values = zip(*sorted(data))
         
-        plt.figure(figsize=(10, 6))
-        bars = plt.bar(scenarios, data_points, color=['#2E86AB', '#A23B72', '#F18F01', '#C73E1D', '#6A994E'])
+        fig, ax = plt.subplots(figsize=(8, 6))
+        colors = ["#6A994E", "#A23B72"]
+        bars = ax.bar(labels, values, color=colors, edgecolor='black', linewidth=1.5)
         
-        plt.title('Data Volume Analyzed by Scenario', fontsize=14, fontweight='bold')
-        plt.xlabel('Business Scenario', fontsize=12)
-        plt.ylabel('Number of Data Points', fontsize=12)
-        plt.xticks(rotation=45, ha='right')
+        ax.set_ylabel("Execution Time (seconds)", fontsize=12, fontweight='bold')
+        ax.set_title("Speed Comparison: Single vs Multi-Agent", fontsize=14, fontweight='bold')
+        
+        for bar, val in zip(bars, values):
+            height = bar.get_height()
+            ax.text(bar.get_x() + bar.get_width() / 2, height + 0.5, 
+                   f"{val:.1f}s", ha="center", va="bottom", fontsize=11, fontweight='bold')
+        
+        ax.grid(axis='y', alpha=0.3)
+        plt.tight_layout()
+        plt.savefig(self.output_dir / "execution_time_comparison.png", dpi=300, bbox_inches="tight")
+        plt.close()
+        print("✅ Created execution_time_comparison.png")
+
+    def create_diversity_lift_chart(self):
+        """Show how diversity (multi-agent) changes quality/content vs single."""
+        single = self.latest_by_mode.get("single")
+        multi = self.latest_by_mode.get("multi")
+        if not single or not multi:
+            print("⚠️  Skipping diversity lift (need both single and multi runs).")
+            return
+
+        metrics = {}
+        
+        # Quality lift
+        if single.get("rubric_percent") is not None and multi.get("rubric_percent") is not None:
+            metrics["Rubric % Lift"] = multi["rubric_percent"] - single["rubric_percent"]
+
+        # Refinement deltas
+        ref = multi.get("refinement_delta") or {}
+        if isinstance(ref, dict):
+            if ref.get("kpis_delta") is not None:
+                metrics["KPI Count Delta"] = ref["kpis_delta"]
+            if ref.get("tactics_delta") is not None:
+                metrics["Tactics Count Delta"] = ref["tactics_delta"]
+            if ref.get("edit_ratio") is not None:
+                metrics["Content Edit Ratio"] = ref["edit_ratio"] * 100  # Convert to %
+
+        if not metrics:
+            print("⚠️  Skipping diversity lift (no comparison metrics found).")
+            return
+
+        labels = list(metrics.keys())
+        values = list(metrics.values())
+        colors = ['#2E86AB' if v >= 0 else '#E63946' for v in values]
+        
+        fig, ax = plt.subplots(figsize=(10, 6))
+        bars = ax.barh(labels, values, color=colors, edgecolor='black', linewidth=1.5)
+        ax.axvline(0, color="black", linewidth=1.5)
+        
+        for bar, val in zip(bars, values):
+            x_pos = val + (2 if val >= 0 else -2)
+            ax.text(x_pos, bar.get_y() + bar.get_height() / 2, f"{val:+.1f}",
+                   va="center", ha="left" if val >= 0 else "right", fontsize=10, fontweight='bold')
+        
+        ax.set_title("Diversity Impact: Multi vs Single Agent", fontsize=14, fontweight='bold')
+        ax.set_xlabel("Change (Multi - Single)", fontsize=12)
+        ax.grid(axis='x', alpha=0.3)
+        plt.tight_layout()
+        plt.savefig(self.output_dir / "diversity_lift.png", dpi=300, bbox_inches="tight")
+        plt.close()
+        print("✅ Created diversity_lift.png")
+
+    def create_strategic_element_comparison(self):
+        """Compare strategic elements between single and multi-agent outputs."""
+        single_text = self._load_strategy_file("openai_strategy.txt") or self._load_strategy_file("openai_strategy.json")
+        multi_text = self._load_strategy_file("final_strategy.txt") or self._load_strategy_file("final_strategy.json")
+        
+        if not single_text or not multi_text:
+            print("⚠️  Skipping strategic element comparison (missing output files).")
+            return
+        
+        single_elements = self.diversity_calc.count_strategic_elements(single_text)
+        multi_elements = self.diversity_calc.count_strategic_elements(multi_text)
+        
+        categories = list(single_elements.keys())
+        single_vals = [single_elements[c] for c in categories]
+        multi_vals = [multi_elements[c] for c in categories]
+        
+        x = np.arange(len(categories))
+        width = 0.35
+        
+        fig, ax = plt.subplots(figsize=(12, 7))
+        bars1 = ax.bar(x - width/2, single_vals, width, label='Single Agent', 
+                       color='#2E86AB', edgecolor='black', linewidth=1.5)
+        bars2 = ax.bar(x + width/2, multi_vals, width, label='Multi Agent', 
+                       color='#F18F01', edgecolor='black', linewidth=1.5)
+        
+        ax.set_ylabel('Mention Count', fontsize=12, fontweight='bold')
+        ax.set_title('Strategic Element Coverage: Single vs Multi-Agent', fontsize=14, fontweight='bold')
+        ax.set_xticks(x)
+        ax.set_xticklabels([c.replace("_", " ").title() for c in categories], rotation=15, ha='right')
+        ax.legend()
+        ax.grid(axis='y', alpha=0.3)
         
         # Add value labels
-        for bar in bars:
-            height = bar.get_height()
-            plt.text(bar.get_x() + bar.get_width()/2., height,
-                    f'{int(height)}',
-                    ha='center', va='bottom', fontsize=9)
+        for bars in [bars1, bars2]:
+            for bar in bars:
+                height = bar.get_height()
+                if height > 0:
+                    ax.text(bar.get_x() + bar.get_width()/2, height + 0.3,
+                           f'{int(height)}', ha='center', va='bottom', fontsize=9)
         
         plt.tight_layout()
-        plt.savefig(self.output_dir / 'data_volume_comparison.png', dpi=300, bbox_inches='tight')
+        plt.savefig(self.output_dir / "strategic_elements.png", dpi=300, bbox_inches="tight")
         plt.close()
-        print("✓ Created data_volume_comparison.png")
-    
-    def create_metrics_comparison_table(self):
-        """Create comprehensive metrics comparison table"""
-        metrics_data = []
+        print("✅ Created strategic_elements.png")
+
+    def create_content_diversity_heatmap(self):
+        """Create heatmap showing content evolution across agent stages."""
+        # Load all three stages for multi-agent
+        openai_text = self._load_strategy_file("openai_strategy.txt") or self._load_strategy_file("openai_strategy.json")
+        claude_text = self._load_strategy_file("claude_strategy.txt") or self._load_strategy_file("claude_strategy.json")
+        gemini_text = self._load_strategy_file("final_strategy.txt") or self._load_strategy_file("final_strategy.json")
         
-        for result in self.results:
-            row = {
-                'Scenario': result['scenario'].replace('_', ' ').title(),
-                'Industry': result['industry'],
-                'Data Points': result['data_points'],
-                'Execution Time (s)': f"{result['execution_time']:.2f}"
-            }
+        if not all([openai_text, claude_text, gemini_text]):
+            print("⚠️  Skipping content diversity heatmap (missing multi-agent outputs).")
+            return
+        
+        # Calculate edit ratios
+        openai_to_claude = self.diversity_calc.calculate_edit_ratio(openai_text, claude_text)
+        claude_to_gemini = self.diversity_calc.calculate_edit_ratio(claude_text, gemini_text)
+        openai_to_gemini = self.diversity_calc.calculate_edit_ratio(openai_text, gemini_text)
+        
+        # Calculate vocabulary diversity
+        vocab_oc = self.diversity_calc.calculate_vocabulary_diversity(openai_text, claude_text)
+        vocab_cg = self.diversity_calc.calculate_vocabulary_diversity(claude_text, gemini_text)
+        vocab_og = self.diversity_calc.calculate_vocabulary_diversity(openai_text, gemini_text)
+        
+        # Create heatmap data
+        data = np.array([
+            [0, openai_to_claude, openai_to_gemini],
+            [openai_to_claude, 0, claude_to_gemini],
+            [openai_to_gemini, claude_to_gemini, 0]
+        ])
+        
+        fig, ax = plt.subplots(figsize=(9, 7))
+        im = ax.imshow(data, cmap='YlOrRd', aspect='auto', vmin=0, vmax=1)
+        
+        agents = ['OpenAI\n(Analyst)', 'Claude\n(Creative)', 'Gemini\n(Operations)']
+        ax.set_xticks(np.arange(len(agents)))
+        ax.set_yticks(np.arange(len(agents)))
+        ax.set_xticklabels(agents)
+        ax.set_yticklabels(agents)
+        
+        # Annotate cells
+        for i in range(len(agents)):
+            for j in range(len(agents)):
+                if i != j:
+                    text = ax.text(j, i, f'{data[i, j]:.2f}',
+                                 ha="center", va="center", color="black", fontweight='bold')
+        
+        ax.set_title("Content Edit Ratio Between Agents\n(Higher = More Change)", 
+                    fontsize=14, fontweight='bold')
+        fig.colorbar(im, ax=ax, label='Edit Ratio (0=identical, 1=completely different)')
+        plt.tight_layout()
+        plt.savefig(self.output_dir / "content_diversity_heatmap.png", dpi=300, bbox_inches="tight")
+        plt.close()
+        print("✅ Created content_diversity_heatmap.png")
+
+    def create_efficiency_tradeoff_scatter(self):
+        """Scatter plot showing quality vs speed tradeoff."""
+        data_points = []
+        for mode, res in self.latest_by_mode.items():
+            quality = res.get("rubric_percent")
+            time = res.get("execution_time_seconds")
+            if quality is not None and time is not None:
+                data_points.append({
+                    "mode": mode.capitalize(),
+                    "quality": quality,
+                    "time": time,
+                    "efficiency": quality / time  # Quality per second
+                })
+        
+        if len(data_points) < 2:
+            print("⚠️  Skipping efficiency tradeoff (need both modes).")
+            return
+        
+        fig, ax = plt.subplots(figsize=(10, 7))
+        
+        for point in data_points:
+            color = '#2E86AB' if point["mode"] == "Single" else '#F18F01'
+            marker = 'o' if point["mode"] == "Single" else 's'
+            size = point["efficiency"] * 100  # Scale for visibility
             
-            # Add scenario-specific metrics
-            if 'avg_revenue' in result:
-                row['Avg Revenue'] = f"${result['avg_revenue']:,.0f}"
-            if 'avg_conversion_rate' in result:
-                row['Conversion Rate'] = f"{result['avg_conversion_rate']:.1f}%"
-            if 'avg_cac' in result:
-                row['CAC'] = f"${result['avg_cac']:.2f}"
-            if 'avg_mqls' in result:
-                row['Avg MQLs'] = f"{result['avg_mqls']:.0f}"
-            if 'avg_deal_size' in result:
-                row['Avg Deal Size'] = f"${result['avg_deal_size']:,.0f}"
-            if 'avg_service_calls' in result:
-                row['Avg Service Calls'] = f"{result['avg_service_calls']:.0f}"
-            if 'avg_donations' in result:
-                row['Avg Donations'] = f"${result['avg_donations']:,.0f}"
-            if 'avg_new_clients' in result:
-                row['Avg New Clients'] = f"{result['avg_new_clients']:.0f}"
+            ax.scatter(point["time"], point["quality"], 
+                      s=size*10, c=color, marker=marker, 
+                      edgecolors='black', linewidths=2, alpha=0.7,
+                      label=f"{point['mode']} (eff: {point['efficiency']:.2f})")
             
-            metrics_data.append(row)
+            # Annotate
+            ax.annotate(point["mode"], 
+                       xy=(point["time"], point["quality"]),
+                       xytext=(10, 10), textcoords='offset points',
+                       fontsize=11, fontweight='bold',
+                       bbox=dict(boxstyle='round', facecolor=color, alpha=0.3))
         
-        df = pd.DataFrame(metrics_data)
+        ax.set_xlabel("Execution Time (seconds)", fontsize=12, fontweight='bold')
+        ax.set_ylabel("Quality Score (%)", fontsize=12, fontweight='bold')
+        ax.set_title("Quality vs Speed Tradeoff\n(Bubble size = Efficiency)", 
+                    fontsize=14, fontweight='bold')
+        ax.grid(True, alpha=0.3)
+        ax.legend(loc='best', fontsize=10)
         
-        # Create visualization
-        fig, ax = plt.subplots(figsize=(14, 5))
+        plt.tight_layout()
+        plt.savefig(self.output_dir / "efficiency_tradeoff.png", dpi=300, bbox_inches="tight")
+        plt.close()
+        print("✅ Created efficiency_tradeoff.png")
+
+    def create_comprehensive_comparison_table(self):
+        """Create a visual comparison table of key metrics."""
+        single = self.latest_by_mode.get("single") or {}
+        multi = self.latest_by_mode.get("multi") or {}
+        
+        if not single or not multi:
+            print("⚠️  Skipping comparison table (need both modes).")
+            return
+        
+        metrics = {
+            "Quality Score (%)": (
+                single.get("rubric_percent", 0),
+                multi.get("rubric_percent", 0)
+            ),
+            "Execution Time (s)": (
+                single.get("execution_time_seconds", 0),
+                multi.get("execution_time_seconds", 0)
+            ),
+            "Schema Valid": (
+                "✓" if single.get("schema_valid") else "✗",
+                "✓" if multi.get("schema_valid") else "✗"
+            ),
+            "KPI Delta": (
+                0,
+                (multi.get("refinement_delta") or {}).get("kpis_delta", 0)
+            ),
+            "Tactics Delta": (
+                0,
+                (multi.get("refinement_delta") or {}).get("tactics_delta", 0)
+            )
+        }
+        
+        fig, ax = plt.subplots(figsize=(10, 6))
         ax.axis('tight')
         ax.axis('off')
         
-        # Create table (colWidths adjusted to match actual columns)
-        col_widths = [0.12] * len(df.columns)  # Dynamic based on column count
-        table = ax.table(cellText=df.values, colLabels=df.columns,
-                        cellLoc='left', loc='center',
-                        colWidths=col_widths)
+        table_data = [["Metric", "Single Agent", "Multi Agent", "Δ Change"]]
         
+        for metric, (single_val, multi_val) in metrics.items():
+            if isinstance(single_val, (int, float)) and isinstance(multi_val, (int, float)):
+                delta = multi_val - single_val
+                delta_str = f"{delta:+.1f}" if isinstance(delta, float) else f"{delta:+d}"
+                single_str = f"{single_val:.1f}" if isinstance(single_val, float) else str(single_val)
+                multi_str = f"{multi_val:.1f}" if isinstance(multi_val, float) else str(multi_val)
+            else:
+                single_str = str(single_val)
+                multi_str = str(multi_val)
+                delta_str = "—"
+            
+            table_data.append([metric, single_str, multi_str, delta_str])
+        
+        table = ax.table(cellText=table_data, cellLoc='center', loc='center',
+                        colWidths=[0.3, 0.2, 0.2, 0.2])
         table.auto_set_font_size(False)
-        table.set_fontsize(9)
+        table.set_fontsize(10)
         table.scale(1, 2)
         
-        # Style header
-        for i in range(len(df.columns)):
+        # Style header row
+        for i in range(4):
             table[(0, i)].set_facecolor('#2E86AB')
             table[(0, i)].set_text_props(weight='bold', color='white')
         
-        # Style rows
-        colors = ['#f0f0f0', 'white']
-        for i in range(1, len(df) + 1):
-            for j in range(len(df.columns)):
-                table[(i, j)].set_facecolor(colors[i % 2])
+        # Color code changes
+        for i in range(1, len(table_data)):
+            delta_cell = table[(i, 3)]
+            if table_data[i][3] not in ["—", "✓", "✗"]:
+                try:
+                    val = float(table_data[i][3].replace("+", ""))
+                    if val > 0:
+                        delta_cell.set_facecolor('#90EE90')
+                    elif val < 0:
+                        delta_cell.set_facecolor('#FFB6C1')
+                except:
+                    pass
         
-        plt.title('Comparative Metrics Summary', fontsize=14, fontweight='bold', pad=20)
-        plt.savefig(self.output_dir / 'metrics_comparison_table.png', dpi=300, bbox_inches='tight')
-        plt.close()
-        print("✓ Created metrics_comparison_table.png")
-        
-        return df
-    
-    def create_performance_heatmap(self):
-        """Create performance metrics heatmap"""
-        # Extract key metrics for heatmap
-        metrics_matrix = []
-        scenarios = []
-        
-        for result in self.results:
-            scenarios.append(result['scenario'].replace('_', ' ').title())
-            
-            # Normalize metrics (example with available data)
-            row = [
-                result['execution_time'],
-                result['data_points'],
-                result.get('avg_revenue', 0) / 10000 if 'avg_revenue' in result else 0,
-                result.get('avg_conversion_rate', 0) if 'avg_conversion_rate' in result else 0,
-                result.get('avg_mqls', 0) if 'avg_mqls' in result else 0
-            ]
-            metrics_matrix.append(row)
-        
-        # Create heatmap
-        plt.figure(figsize=(10, 6))
-        sns.heatmap(metrics_matrix, 
-                   annot=True, 
-                   fmt='.1f',
-                   cmap='YlOrRd',
-                   xticklabels=['Execution Time', 'Data Volume', 'Revenue Index', 'Conversion %', 'Lead Gen Index'],
-                   yticklabels=scenarios)
-        
-        plt.title('Performance Metrics Heatmap', fontsize=14, fontweight='bold')
-        plt.tight_layout()
-        plt.savefig(self.output_dir / 'performance_heatmap.png', dpi=300, bbox_inches='tight')
-        plt.close()
-        print("✓ Created performance_heatmap.png")
-    
-    def create_scenario_comparison_radar(self):
-        """Create radar chart comparing scenarios"""
-        # Prepare data for radar chart
-        categories = ['Data Volume', 'Processing Speed', 'Complexity', 'Data Quality', 'Actionability']
-        
-        fig = plt.figure(figsize=(10, 8))
-        ax = fig.add_subplot(111, projection='polar')
-        
-        # Sample data for each scenario (normalized 0-10)
-        scenario_scores = {
-            'E-commerce Fashion': [9, 8, 7, 9, 8],
-            'SaaS B2B': [9, 8, 8, 9, 9],
-            'Local Services': [9, 8, 6, 8, 7],
-            'Nonprofit': [9, 8, 7, 8, 8],
-            'Wellness Coaching': [9, 8, 6, 8, 8]
-        }
-        
-        angles = np.linspace(0, 2 * np.pi, len(categories), endpoint=False).tolist()
-        angles += angles[:1]
-        
-        colors = ['#2E86AB', '#A23B72', '#F18F01', '#C73E1D', '#6A994E']
-        
-        for (scenario, scores), color in zip(scenario_scores.items(), colors):
-            scores += scores[:1]
-            ax.plot(angles, scores, 'o-', linewidth=2, label=scenario, color=color)
-            ax.fill(angles, scores, alpha=0.15, color=color)
-        
-        ax.set_xticks(angles[:-1])
-        ax.set_xticklabels(categories, size=10)
-        ax.set_ylim(0, 10)
-        ax.set_yticks([2, 4, 6, 8, 10])
-        ax.set_yticklabels(['2', '4', '6', '8', '10'], size=8)
-        ax.grid(True)
-        
-        plt.title('Scenario Comparison: Multi-Dimensional Analysis', 
+        plt.title("Comprehensive Comparison: Single vs Multi-Agent", 
                  fontsize=14, fontweight='bold', pad=20)
-        plt.legend(loc='upper right', bbox_to_anchor=(1.3, 1.0))
-        
         plt.tight_layout()
-        plt.savefig(self.output_dir / 'scenario_radar_chart.png', dpi=300, bbox_inches='tight')
+        plt.savefig(self.output_dir / "comparison_table.png", dpi=300, bbox_inches="tight")
         plt.close()
-        print("✓ Created scenario_radar_chart.png")
-    
+        print("✅ Created comparison_table.png")
+
     def generate_all_visualizations(self):
-        """Generate all visualizations"""
-        print("\n" + "="*60)
-        print("GENERATING VISUALIZATIONS")
-        print("="*60 + "\n")
+        """Generate all visualizations."""
+        print("\n" + "=" * 70)
+        print("GENERATING ENHANCED VISUALIZATIONS")
+        print("=" * 70 + "\n")
+
+        viz_methods = [
+            ("Quality Comparison", self.create_quality_comparison),
+            ("Execution Time", self.create_execution_time_chart),
+            ("Diversity Lift", self.create_diversity_lift_chart),
+            ("Strategic Elements", self.create_strategic_element_comparison),
+            ("Content Diversity Heatmap", self.create_content_diversity_heatmap),
+            ("Efficiency Tradeoff", self.create_efficiency_tradeoff_scatter),
+            ("Comparison Table", self.create_comprehensive_comparison_table),
+        ]
         
-        self.create_execution_time_chart()
-        self.create_data_volume_chart()
-        self.create_metrics_comparison_table()
-        self.create_performance_heatmap()
-        self.create_scenario_comparison_radar()
+        for name, method in viz_methods:
+            try:
+                print(f"📊 Generating {name}...")
+                method()
+            except Exception as e:
+                print(f"❌ Error generating {name}: {e}")
         
-        print("\n✓ All visualizations generated successfully!")
-        print(f"  Files saved in: {self.output_dir}/")
+        print("\n" + "=" * 70)
+        print(f"✅ Visualization generation complete!")
+        print(f"📁 Files saved in: {self.output_dir.absolute()}/")
+        print("=" * 70 + "\n")
 
 
 def main():
-    generator = VisualizationGenerator()
-    generator.generate_all_visualizations()
+    """Main entry point."""
+    try:
+        generator = VisualizationGenerator()
+        generator.generate_all_visualizations()
+    except FileNotFoundError as e:
+        print(f"\n❌ Error: {e}")
+        print("\n💡 To generate visualizations:")
+        print("   1. Run: python main.py (will run multi-agent by default)")
+        print("   2. Run: python main.py --mode single (for single-agent)")
+        print("   3. Then run this script again\n")
+    except Exception as e:
+        print(f"\n❌ Unexpected error: {e}")
+        raise
 
 
 if __name__ == "__main__":

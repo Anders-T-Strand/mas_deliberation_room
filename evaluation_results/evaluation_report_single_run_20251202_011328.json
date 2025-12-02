@@ -1,0 +1,53 @@
+{
+  "test_case": "single_run",
+  "timestamp": "2025-12-02T01:13:28.463013",
+  "metrics": {
+    "functionality": {
+      "execution_successful": true,
+      "all_tasks_completed": true,
+      "output_file_generated": true,
+      "overall_pass": true,
+      "error_log": "",
+      "timestamp": "2025-12-02T01:13:28.449792"
+    },
+    "performance": {
+      "execution_time_seconds": 14.936768770217896,
+      "total_tokens": 0,
+      "tokens_by_type": {
+        "prompt_tokens": 0,
+        "completion_tokens": 0
+      },
+      "cost_usd": 0.0,
+      "timestamp": "2025-12-02T01:13:28.449792"
+    },
+    "schema": {
+      "valid": false,
+      "issues": [
+        "budget_numbers_missing"
+      ]
+    },
+    "rubric": {
+      "checks": {
+        "weaknesses_3_to_5": true,
+        "competitors>=2": false,
+        "kpis_numeric_timebound": true,
+        "tactics_have_roi_rank": false,
+        "budget_consistent": false,
+        "context_mentions_industry_audience": false,
+        "references_sales_data": false
+      },
+      "score_0_to_7": 2,
+      "percent": 28.6
+    }
+  },
+  "summary": {
+    "functionality_status": "PASS",
+    "execution_time": "14.94s",
+    "total_cost": "$0.0000",
+    "schema_valid": false,
+    "schema_issues": [
+      "budget_numbers_missing"
+    ],
+    "rubric_percent": 28.6
+  }
+}

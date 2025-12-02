@@ -73,6 +73,22 @@ The reason for the use of gemini right now is because it's free for me right now
 Next steps will be to add another agent until I hit the goal of four agents working together.
 Currently the tasks are running in sequential order, this can be changed but requires some adjustments. Read CerwAI documentation for this.
 
+### Current agents (3)
+- OpenAI analyst (data-driven diagnostics)
+- Claude creative architect (competitor intel + campaign design)
+- Gemini operations director (execution, budgets, KPIs)
+
+> Note: The Claude agent defaults to `anthropic/claude-3-haiku-20240307` to avoid model not-found issues. Set `ANTHROPIC_API_KEY` and adjust the model id in `config/agents.yaml` if you have access to Sonnet-tier models.
+
+Run modes:
+- Single agent: `MAS_RUN_MODE=single crewai run`
+- Multi agent (all three): `MAS_RUN_MODE=multi crewai run` (default)
+- Back-to-back comparison: `MAS_RUN_MODE=both crewai run` (writes both runs)
+
+Outputs and visualizations:
+- Per-mode metrics are stored in `output/agent_mode_results.json` (rubric %, schema validity, timing, refinement deltas).
+- Charts in `output/` compare single vs multi (`quality_comparison.png`, `execution_time_comparison.png`, `diversity_lift.png`).
+
 ## Example
 
 The example I have used so far is as following:

@@ -55,6 +55,14 @@ class EvaluationMetrics:
         if not raw:
             return None
         raw = raw.strip()
+        # Remove simple Markdown fences if present
+        if raw.startswith("```"):
+            raw = raw.strip("`").strip()
+            # If content after stripping starts with a language tag, drop the first line
+            if "\n" in raw:
+                parts = raw.split("\n", 1)
+                if parts[0].isalpha() or parts[0].startswith("json"):
+                    raw = parts[1]
         start = raw.find("{")
         end = raw.rfind("}")
         if start == -1 or end == -1 or end <= start:
@@ -364,6 +372,27 @@ class EvaluationHarness:
         # 3) Quality via strict JSON + rubric
         generated_text = path_to_read.read_text(encoding="utf-8") if output_file_generated else ""
         doc = self.evaluator._extract_json(generated_text)
+
+        # Fallback order: try Claude (if present), then OpenAI stage. Track source for debugging.
+        if not doc:
+            claude_path = Path("output/claude_strategy.json")
+            if claude_path.exists():
+                try:
+                    base_text = claude_path.read_text(encoding="utf-8")
+                    doc = self.evaluator._extract_json(base_text)
+                    if doc:
+                        self.evaluator.metrics["parse_fallback"] = "claude_strategy.json"
+                except Exception:
+                    pass
+        if not doc and openai_output_path and openai_output_path.exists():
+            try:
+                base_text = openai_output_path.read_text(encoding="utf-8")
+                doc = self.evaluator._extract_json(base_text)
+                if doc:
+                    self.evaluator.metrics["parse_fallback"] = "openai_output_path"
+            except Exception:
+                pass
+
         if doc:
             schema = self.evaluator.validate_schema(doc)
             rubric = self.evaluator.score_strategy_doc(doc, user_inputs)

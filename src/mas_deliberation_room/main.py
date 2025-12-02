@@ -3,6 +3,7 @@
 import sys
 import warnings
 import os
+import json
 import pandas as pd
 from pathlib import Path
 from datetime import datetime
@@ -26,16 +27,35 @@ os.makedirs('output', exist_ok=True)
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 DEFAULT_STRATEGY_FILE = PROJECT_ROOT / "datasets" / "ecommerce_fashion_strategy.txt"
 DEFAULT_DATA_FILE = PROJECT_ROOT / "datasets" / "ecommerce_fashion.csv"
+AGENT_MODE_RESULTS_FILE = PROJECT_ROOT / "output" / "agent_mode_results.json"
 
 
 warnings.filterwarnings("ignore", category=SyntaxWarning, module="pysbd")
 
+def _resolve_with_project_root(file_path: Path, default_path: Path) -> Path:
+    """
+    Try multiple resolutions so users can pass relative paths without breaking.
+    Order: as-given, relative to PROJECT_ROOT, relative to PROJECT_ROOT/datasets, then default.
+    """
+    candidates = [
+        file_path,
+        PROJECT_ROOT / file_path,
+        PROJECT_ROOT / "datasets" / file_path.name,
+        default_path,
+    ]
+    for candidate in candidates:
+        try:
+            candidate_resolved = candidate.expanduser().resolve()
+        except Exception:
+            candidate_resolved = candidate
+        if candidate_resolved.exists():
+            return candidate_resolved
+    return default_path
+
+
 def read_strategy_file(file_path=DEFAULT_STRATEGY_FILE):
     
-    file_path = Path(file_path)
-    
-    if not file_path.exists():
-        raise FileNotFoundError(f"Strategy file not found: {file_path}")
+    file_path = _resolve_with_project_root(Path(file_path), DEFAULT_STRATEGY_FILE)
     
     # Handle text files
     if file_path.suffix.lower() in ['.txt', '.md']:
@@ -65,7 +85,7 @@ def read_strategy_file(file_path=DEFAULT_STRATEGY_FILE):
 
 def read_csv_data(file_path=DEFAULT_DATA_FILE):
    
-    file_path = Path(file_path)
+    file_path = _resolve_with_project_root(Path(file_path), DEFAULT_DATA_FILE)
     
     if not file_path.exists():
         raise FileNotFoundError(f"CSV file not found: {file_path}")
@@ -135,6 +155,30 @@ def format_data_summary(data_info):
             output += f"    Range: {stats['min']:.2f} - {stats['max']:.2f}\n"
     
     return output
+
+
+def record_agent_mode_result(agent_mode: str, eval_metrics: dict, execution_time: float):
+    """Persist a lightweight summary for single vs multi runs."""
+    result_entry = {
+        "agent_mode": agent_mode,
+        "timestamp": datetime.now().isoformat(),
+        "execution_time_seconds": execution_time,
+        "rubric_percent": eval_metrics.get("rubric", {}).get("percent"),
+        "rubric_score": eval_metrics.get("rubric", {}).get("score_0_to_7"),
+        "schema_valid": eval_metrics.get("schema", {}).get("valid"),
+        "schema_issues": eval_metrics.get("schema", {}).get("issues", []),
+        "refinement_delta": eval_metrics.get("refinement_delta"),
+    }
+
+    existing = []
+    if AGENT_MODE_RESULTS_FILE.exists():
+        try:
+            existing = json.loads(AGENT_MODE_RESULTS_FILE.read_text(encoding="utf-8"))
+        except Exception:
+            existing = []
+
+    existing.append(result_entry)
+    AGENT_MODE_RESULTS_FILE.write_text(json.dumps(existing, indent=2), encoding="utf-8")
 
 
 def run_interactive():
@@ -210,13 +254,13 @@ def run_interactive():
         # Create crew
         crew = MasDeliberationRoom().crew()
 
-        # --- TOKEN LIMITER (max 700 tokens per agent) ---
+        # --- TOKEN LIMITER (max 3000 tokens per agent) ---
         for agent in crew.agents:
             # Works across LLM backends CrewAI wraps; if the LLM object exists, set there too.
-            setattr(agent, "max_tokens", 700)
+            setattr(agent, "max_tokens", 3000)
             if hasattr(agent, "llm") and hasattr(agent.llm, "max_tokens"):
-                agent.llm.max_tokens = 700
-        print("🔒 Token limit set to 700 per agent\n")
+                agent.llm.max_tokens = 3000
+        print("🔒 Token limit set to 3000 per agent\n")
 
         # Time the run for evaluation
         import time
@@ -228,21 +272,24 @@ def run_interactive():
 
         # --- EVALUATION ---
         harness = EvaluationHarness()
-        harness.run_evaluation(
+        # Point evaluation at JSON outputs to ensure structured parsing
+        eval_metrics = harness.run_evaluation(
             crew_result=result,
             user_inputs=inputs,
             execution_time=exec_time,
-            test_case_name="manual_run"
+            test_case_name="manual_run",
+            final_output_path=Path("output/final_strategy.json"),
+            openai_output_path=Path("output/openai_strategy.json"),
         )
+        record_agent_mode_result("multi", eval_metrics, exec_time)
 
         # --- VISUALIZATION ---
-        from pathlib import Path as _P
-        if (_P("output") / "experimental_results.json").exists():
+        if AGENT_MODE_RESULTS_FILE.exists():
             vg = VisualizationGenerator()
             vg.generate_all_visualizations()
         else:
-            print("ℹ️ Skipping visualizations (output/experimental_results.json not found). "
-                "Run your experimental suite first if you want the charts.")
+            print("ℹ️ Skipping visualizations (agent_mode_results.json not found). "
+                "Run single and multi-agent modes to populate comparison charts.")
 
     except Exception as e:
         print(f"\n❌ Error during analysis: {e}")
@@ -251,14 +298,14 @@ def run_interactive():
 
 
 def run_with_files(
-    strategy_file=None,
-    data_file=None,
+    strategy_file="..//datasets/ecommerce_fashion_strategy.txt",
+    data_file="..//datasets/ecommerce_fashion.csv",
     industry="E-commerce",
     target_audience="Women 25-45",
-    mode: str = "multi",
+    mode="both",
 ):
-    strategy_file = Path(strategy_file or DEFAULT_STRATEGY_FILE)
-    data_file = Path(data_file or DEFAULT_DATA_FILE)
+    strategy_file = _resolve_with_project_root(Path(strategy_file or DEFAULT_STRATEGY_FILE), DEFAULT_STRATEGY_FILE)
+    data_file = _resolve_with_project_root(Path(data_file or DEFAULT_DATA_FILE), DEFAULT_DATA_FILE)
     mode = (mode or "multi").lower()
     if mode not in {"single", "multi", "both"}:
         raise ValueError("mode must be one of: single, multi, both")
@@ -297,13 +344,13 @@ def run_with_files(
             crew_builder = MasDeliberationRoom()
             crew = crew_builder.single_agent_crew() if selected_mode == "single" else crew_builder.crew()
 
-            # --- TOKEN LIMITER (max 700 tokens per agent) ---
+            # --- TOKEN LIMITER (max 3000 tokens per agent) ---
             for agent in crew.agents:
                 # Works across LLM backends CrewAI wraps; if the LLM object exists, set there too.
-                setattr(agent, "max_tokens", 700)
+                setattr(agent, "max_tokens", 3000)
                 if hasattr(agent, "llm") and hasattr(agent.llm, "max_tokens"):
-                    agent.llm.max_tokens = 700
-            print("🔒 Token limit set to 700 per agent\n")
+                    agent.llm.max_tokens = 3000
+            print("🔒 Token limit set to 3000 per agent\n")
 
             # Time the run for evaluation
             import time
@@ -315,21 +362,26 @@ def run_with_files(
 
             # --- EVALUATION ---
             harness = EvaluationHarness()
-            harness.run_evaluation(
+            # Use JSON outputs so evaluation can parse structured content
+            final_output_path = Path("output/openai_strategy.json") if selected_mode == "single" else Path("output/final_strategy.json")
+            openai_output_path = None if selected_mode == "single" else Path("output/openai_strategy.json")
+            eval_metrics = harness.run_evaluation(
                 crew_result=result,
                 user_inputs=inputs,
                 execution_time=exec_time,
-                test_case_name=f"{selected_mode}_run"
+                test_case_name=f"{selected_mode}_run",
+                final_output_path=final_output_path,
+                openai_output_path=openai_output_path,
             )
+            record_agent_mode_result(selected_mode, eval_metrics, exec_time)
 
             # --- VISUALIZATION ---
-            from pathlib import Path as _P
-            if (_P("output") / "experimental_results.json").exists():
+            if AGENT_MODE_RESULTS_FILE.exists():
                 vg = VisualizationGenerator()
                 vg.generate_all_visualizations()
             else:
-                print("ℹ️ Skipping visualizations (output/experimental_results.json not found). "
-                    "Run your experimental suite first if you want the charts.")
+                print("ℹ️ Skipping visualizations (agent_mode_results.json not found). "
+                    "Run single and multi-agent modes to populate comparison charts.")
 
         except Exception as e:
             print(f"\n❌ Error during analysis in {selected_mode} mode: {e}")
@@ -355,7 +407,7 @@ def run():
         run_with_files(strategy_file, data_file, industry, target_audience, mode)
     else:
         # Allow environment override when no CLI args are provided
-        run_with_files(mode=os.environ.get("MAS_RUN_MODE", "multi"))
+        run_with_files(mode=os.environ.get("MAS_RUN_MODE", "both"))
 
 
 if __name__ == "__main__":

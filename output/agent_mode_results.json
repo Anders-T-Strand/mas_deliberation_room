@@ -1,0 +1,31 @@
+[
+  {
+    "agent_mode": "single",
+    "timestamp": "2025-12-02T01:13:28.466392",
+    "execution_time_seconds": 14.936768770217896,
+    "rubric_percent": 28.6,
+    "rubric_score": 2,
+    "schema_valid": false,
+    "schema_issues": [
+      "budget_numbers_missing"
+    ],
+    "refinement_delta": null
+  },
+  {
+    "agent_mode": "multi",
+    "timestamp": "2025-12-02T01:13:58.512273",
+    "execution_time_seconds": 29.497739791870117,
+    "rubric_percent": 71.4,
+    "rubric_score": 5,
+    "schema_valid": false,
+    "schema_issues": [
+      "budget_numbers_missing"
+    ],
+    "refinement_delta": {
+      "edit_ratio": 0.302,
+      "kpis_delta": 0,
+      "tactics_delta": 0,
+      "has_budget_now": false
+    }
+  }
+]
