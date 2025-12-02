@@ -254,13 +254,20 @@ def run_interactive():
         # Create crew
         crew = MasDeliberationRoom().crew()
 
-        # --- TOKEN LIMITER (max 3000 tokens per agent) ---
+        # --- GRADUATED TOKEN LIMITER by agent role ---
+        token_limits = {
+            "Data-Driven Marketing Strategist": 4000,   # OpenAI baseline (gpt-4o-mini max: 16384)
+            "Creative Marketing Architect": 4096,        # Claude Haiku (max: 4096)
+            "Marketing Operations Director": 8000,       # Gemini 2.5 Flash (max: 8192)
+        }
         for agent in crew.agents:
-            # Works across LLM backends CrewAI wraps; if the LLM object exists, set there too.
-            setattr(agent, "max_tokens", 3000)
+            agent_role = (agent.role.strip() if hasattr(agent, 'role') else "Unknown")
+            limit = token_limits.get(agent_role, 4000)  # Default to OpenAI limit
+            setattr(agent, "max_tokens", limit)
             if hasattr(agent, "llm") and hasattr(agent.llm, "max_tokens"):
-                agent.llm.max_tokens = 3000
-        print("🔒 Token limit set to 3000 per agent\n")
+                agent.llm.max_tokens = limit
+            print(f"[Token limit] {agent_role}: {limit} tokens")
+        print()
 
         # Time the run for evaluation
         import time
@@ -338,19 +345,26 @@ def run_with_files(
         }
         
         # Run analysis
-        print("🤖 Starting AI analysis...\n")
+        print("Starting AI analysis...\n")
         try:
             # Create crew
             crew_builder = MasDeliberationRoom()
             crew = crew_builder.single_agent_crew() if selected_mode == "single" else crew_builder.crew()
 
-            # --- TOKEN LIMITER (max 3000 tokens per agent) ---
+            # --- GRADUATED TOKEN LIMITER by agent role ---
+            token_limits = {
+                "Data-Driven Marketing Strategist": 4000,   # OpenAI baseline (gpt-4o-mini max: 16384)
+                "Creative Marketing Architect": 4096,        # Claude Haiku (max: 4096)
+                "Marketing Operations Director": 8000,       # Gemini 2.5 Flash (max: 8192)
+            }
             for agent in crew.agents:
-                # Works across LLM backends CrewAI wraps; if the LLM object exists, set there too.
-                setattr(agent, "max_tokens", 3000)
+                agent_role = (agent.role.strip() if hasattr(agent, 'role') else "Unknown")
+                limit = token_limits.get(agent_role, 4000)  # Default to OpenAI limit
+                setattr(agent, "max_tokens", limit)
                 if hasattr(agent, "llm") and hasattr(agent.llm, "max_tokens"):
-                    agent.llm.max_tokens = 3000
-            print("🔒 Token limit set to 3000 per agent\n")
+                    agent.llm.max_tokens = limit
+                print(f"[Token limit] {agent_role}: {limit} tokens")
+            print()
 
             # Time the run for evaluation
             import time
@@ -358,7 +372,7 @@ def run_with_files(
             result = crew.kickoff(inputs=inputs)
             exec_time = time.time() - _t0
 
-            print("\n✅ Analysis complete! Check output/marketing_strategy_report.md")
+            print("\n[SUCCESS] Analysis complete! Check output/marketing_strategy_report.md")
 
             # --- EVALUATION ---
             harness = EvaluationHarness()
@@ -380,11 +394,11 @@ def run_with_files(
                 vg = VisualizationGenerator()
                 vg.generate_all_visualizations()
             else:
-                print("ℹ️ Skipping visualizations (agent_mode_results.json not found). "
+                print("[INFO] Skipping visualizations (agent_mode_results.json not found). "
                     "Run single and multi-agent modes to populate comparison charts.")
 
         except Exception as e:
-            print(f"\n❌ Error during analysis in {selected_mode} mode: {e}")
+            print(f"\n[ERROR] Error during analysis in {selected_mode} mode: {e}")
             raise
 
     if mode == "both":

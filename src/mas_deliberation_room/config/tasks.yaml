@@ -1,121 +1,153 @@
 marketing_openai_task:
   description: >
-    Your job is to create the **baseline strategy**. This output MUST already satisfy
-    ALL rubric items, because later agents will ONLY enhance the text, not fix missing items.
+    Create a marketing strategy for {industry} industry targeting {target_audience}.
 
-    REQUIRED IN strategy_text:
-    - The industry string: "{industry}"
-    - The target audience string: "{target_audience}"
-    - At least one concrete numeric detail from: {sales_data}
+    Current strategy: {current_strategy}
+    Sales data: {sales_data}
 
-    REQUIRED BEHAVIOR:
-    - ABSOLUTELY NO markdown, NO ```json, NO commentary — JSON ONLY
-    - Maintain EXACT schema as shown below
-    - All KPIs must have numeric 'current', numeric 'target', and numeric 'timeframe_days'
-    - weaknesses: 3–4 items
-    - competitors: EXACTLY 2 items
-    - kpis: EXACTLY 3–4 items
-    - tactics: EXACTLY 4–6 items
-    - budget.items: EXACTLY 5 items, sum to 580000
-    - NEVER use placeholders like X% or Y%
-    - strategy_text <= 250 words
+    CRITICAL SCHEMA REQUIREMENTS - Pay special attention to:
+    1. Budget MUST have "total_usd" (number) and "items" (array of objects with "category" and "usd")
+    2. Each KPI MUST have "name", "current", "target", and "timeframe_days"
+    3. Each competitor MUST be an object with "name", "strength", and "weakness"
+    4. Output ONLY JSON - NO markdown fences (```json), NO text before or after
 
-    YOU MUST OUTPUT ONLY THIS JSON STRUCTURE:
-
-    {
-      "strategy_text": "...",
-      "weaknesses": [...],
-      "kpis": [...],
-      "competitors": [...],
-      "tactics": [...],
-      "budget": {...},
-      "benchmarks": [...],
-      "assumptions": [...]
-    }
-
-    Your output is the foundation for all other agents. If you omit ANY required detail,
-    later agents cannot repair it.
-  expected_output: >
-    Valid JSON with all fields populated and rubric-complete.
+    OUTPUT ONLY THIS EXACT JSON STRUCTURE:
+    
+    {{
+      "strategy_text": "2-3 paragraph executive summary mentioning {industry} and {target_audience}",
+      "weaknesses": [
+        {{"title": "High CAC", "description": "Current $70 CAC is high", "impact": "Reduces profitability"}},
+        {{"title": "Low repeat rate", "description": "Only 40% return", "impact": "Lost revenue"}},
+        {{"title": "Channel dependence", "description": "60% on Instagram", "impact": "Algorithm risk"}}
+      ],
+      "kpis": [
+        {{"name": "CAC Reduction", "current": 70, "target": 55, "timeframe_days": 180}},
+        {{"name": "Repeat Purchase Rate", "current": 40, "target": 55, "timeframe_days": 365}},
+        {{"name": "Email Open Rate", "current": 22, "target": 28, "timeframe_days": 180}}
+      ],
+      "competitors": [
+        {{"name": "ASOS", "strength": "72% repeat rate", "weakness": "Generic brand"}},
+        {{"name": "Shein", "strength": "TikTok mastery", "weakness": "Quality issues"}}
+      ],
+      "tactics": [
+        {{"name": "Loyalty Program", "description": "Points-based system", "roi_rank": 1, "difficulty": "Medium", "budget_usd": 50000}},
+        {{"name": "TikTok Expansion", "description": "Influencer partnerships", "roi_rank": 2, "difficulty": "Medium", "budget_usd": 100000}},
+        {{"name": "Email Optimization", "description": "Segmentation & personalization", "roi_rank": 3, "difficulty": "Low", "budget_usd": 20000}},
+        {{"name": "SEO Investment", "description": "Organic traffic growth", "roi_rank": 4, "difficulty": "High", "budget_usd": 30000}}
+      ],
+      "budget": {{
+        "total_usd": 580000,
+        "items": [
+          {{"category": "Instagram", "usd": 350000}},
+          {{"category": "TikTok", "usd": 100000}},
+          {{"category": "Loyalty", "usd": 50000}},
+          {{"category": "Email", "usd": 20000}},
+          {{"category": "Google Ads", "usd": 30000}},
+          {{"category": "SEO", "usd": 30000}}
+        ]
+      }},
+      "benchmarks": [
+        "Industry avg CAC: $50-60",
+        "Industry avg repeat rate: 60-70%",
+        "Industry avg email open: 25-30%"
+      ],
+      "assumptions": [
+        "Monthly budget remains $580K",
+        "AOV stable at $162.50",
+        "No major platform algorithm changes"
+      ]
+    }}
+    
+    CRITICAL: Output ONLY the JSON above. NO markdown fences, NO explanations, NO text before or after.
+  
+  expected_output: Valid JSON object with all required fields
   agent: marketing_openai_analyst
   output_key: openai_strategy
   output_file: output/openai_strategy.json
 
 
-
 marketing_claude_task:
   description: >
-    Input JSON: {{ openai_strategy }}
+    Enhance this strategy with creativity: {{ openai_strategy }}
 
-    Your job is to ENHANCE — NOT restructure — the baseline strategy.
+    CRITICAL PRESERVATION REQUIREMENTS:
+    - PRESERVE budget structure: must keep "total_usd" and "items" array (do NOT flatten to flat dict)
+    - PRESERVE KPI "name" field in every KPI object
+    - PRESERVE competitor object structure with "name", "strength", "weakness"
+    - You may enhance descriptions and add creative flair, but NEVER change field names or structure
 
-    HARD RULES:
-    - KEEP ALL list lengths exactly the same (do NOT add or remove weaknesses, KPIs, competitors, tactics)
-    - KEEP all numeric values exactly as provided unless improving clarity
-    - DO NOT remove references to:
-        - industry ("{industry}")
-        - target audience ("{target_audience}")
-        - sales_data (at least one numeric detail)
-    - DO NOT remove any fields from the JSON
-    - DO NOT introduce new top-level keys
-    - strategy_text <= 250 words
-    - JSON ONLY (no markdown, no backticks)
-    - Your enhancements must be narrative, emotional, creative — NOT structural
+    Add creative elements while keeping EXACT JSON structure. Enhance:
+    - strategy_text: Add brand voice and emotional appeal
+    - tactics: Add creative execution details (content themes, influencer types) AND add 1-2 innovative tactics
+    - competitors: Add positioning insights
+    - kpis: Consider adding 1 creative KPI (e.g., "Brand Sentiment", "Social Engagement Rate")
 
-    WHAT YOU MAY ADD:
-    - Creative language in strategy_text
-    - Emotional resonance and brand storytelling
-    - Enhanced competitor positioning
-    - Creative angle to tactics
-    - Additional KPI context (BUT do not add new KPI objects)
-
-    OUTPUT:
-    - The FULL JSON object with the SAME schema and SAME list lengths, enhanced creatively.
-  expected_output: >
-    Enhanced JSON with identical structure and list lengths.
+    CRITICAL: If you add tactics, you MUST add corresponding budget items and update budget.total_usd!
+    Example: Add "AR Fittings" tactic ($80k) → Add {"category": "AR Technology", "usd": 80000} to budget.items → Update total_usd from 580000 to 660000
+    
+    OUTPUT ONLY VALID JSON (no markdown, no preamble):
+    
+    {{
+      "strategy_text": "Enhanced with creative positioning...",
+      "weaknesses": [same array but enhanced descriptions],
+      "kpis": [same array PLUS add 1 creative KPI like "brand sentiment" or "social engagement"],
+      "competitors": [same array but add positioning insights],
+      "tactics": [same array PLUS add 1-2 innovative tactics with creative execution details],
+      "budget": {if you added tactics, add corresponding budget items and UPDATE total_usd to match the sum},
+      "benchmarks": [same array],
+      "assumptions": [same array]
+    }}
+    
+    CRITICAL: Output ONLY JSON. NO ```json fences. NO text before or after.
+  
+  expected_output: Enhanced JSON maintaining exact structure
   agent: marketing_claude_analyst
   output_key: claude_strategy
   output_file: output/claude_strategy.json
   context: [marketing_openai_task]
 
 
-
 marketing_gemini_task:
   description: >
-    Input JSON: {{ claude_strategy }}
+    Finalize this strategy with operational details: {{ claude_strategy }}
 
-    Your job is FINALIZATION + OPERATIONALIZATION.
+    YOU ARE THE FINAL VALIDATOR. Your critical responsibilities:
+    1. Verify budget has "total_usd" (number) and "items" (array) - check that sum matches total
+    2. Ensure every KPI has "name" field
+    3. Ensure every competitor is an object with "name", "strength", "weakness"
+    4. Output COMPLETE VALID JSON - no truncation, no markdown fences (```json)
+    5. You have 8000 tokens - use them to produce a COMPLETE response
 
-    RULES (MUST FOLLOW):
-    - KEEP all existing keys
-    - KEEP all list lengths EXACTLY the same for:
-        weaknesses, kpis, competitors, tactics, budget.items, benchmarks, assumptions
-    - You MAY add new top-level arrays: implementation_phases, team_requirements,
-      technology_stack, risks, success_criteria
-    - NEVER remove:
-        - industry reference ("{industry}")
-        - target audience reference ("{target_audience}")
-        - at least one numeric reference from {sales_data}
-    - Validate and FIX:
-        - budget math
-        - KPI timeframes & numeric targets
-        - tactic ROI ranks
-        - missing rubric elements
-
-    REQUIRED ADDITIONS:
-    - implementation_phases (2 phases)
-    - team_requirements (5+ roles)
-    - technology_stack (2–3 tools)
-    - risks (2+)
-    - success_criteria (2+ metrics)
-
-    RESPONSE FORMAT:
-    - JSON ONLY (no markdown, no commentary)
-    - Complete JSON object including all original fields + new operational fields
-    - strategy_text <= 250 words
-  expected_output: >
-    Fully operational final strategy: schema-compliant + execution-ready.
+    Add implementation details while keeping EXACT JSON structure:
+    
+    OUTPUT ONLY VALID JSON (no markdown, no preamble):
+    
+    {{
+      "strategy_text": "Final polished version",
+      "weaknesses": [keep existing],
+      "kpis": [keep existing + add measurement methods],
+      "competitors": [keep existing],
+      "tactics": [keep existing + add timelines],
+      "budget": {keep exact structure with "total_usd" and "items" array - verify sum matches total},
+      "benchmarks": [keep existing],
+      "assumptions": [keep existing],
+      "implementation_phases": [
+        {{"phase": "Months 1-3", "focus": "Foundation", "milestones": ["Launch loyalty program", "TikTok pilot"]}},
+        {{"phase": "Months 4-6", "focus": "Scale", "milestones": ["TikTok expansion", "Email automation"]}}
+      ],
+      "team_requirements": [
+        {{"role": "Social Media Manager", "fte": 1.0}},
+        {{"role": "Email Specialist", "fte": 0.5}}
+      ],
+      "risks": [
+        {{"risk": "Algorithm changes", "mitigation": "Multi-platform diversification"}},
+        {{"risk": "CAC inflation", "mitigation": "Referral + SEO focus"}}
+      ]
+    }}
+    
+    CRITICAL: Output ONLY JSON. NO ```json fences. NO text before or after. Ensure budget sums correctly.
+  
+  expected_output: Final execution-ready JSON with implementation details
   agent: marketing_gemini_analyst
   output_file: output/final_strategy.json
   context: [marketing_openai_task, marketing_claude_task]
-

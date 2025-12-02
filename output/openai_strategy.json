@@ -1,50 +1,49 @@
 {
-  "strategy_text": "In the E-commerce industry, targeting Women aged 25-45, our strategy focuses on enhancing brand visibility and increasing sales revenue. Based on our sales data for Q1 2024, the average revenue generated was $48,049.79 with an average order value of approximately $165.53. To build competitive advantage, we will address the identified weaknesses: high customer acquisition costs (CAC), fluctuating conversion rates, limited Instagram recognition, and low customer loyalty. Our key competitors are 'Zappos' and 'ASOS', known for their robust online presence and customer engagement. To measure performance, we have established KPIs: Revenue Growth with a current value of $48,049.79 aiming for a target of $60,000 in 90 days, Conversion Rate with a current rate of 10.53% aimed to reach 15% in the same timeframe, and Customer Lifetime Value (CLTV) currently at $600, targeting $800 over 90 days. Our budget of $580,000 is allocated across various strategies including content marketing, social media ads, influencer partnerships, and website optimization to increase visibility and conversions within our target demographic.",
+  "strategy_text": "This marketing strategy is tailored for the fashion e-commerce industry, specifically targeting women aged 25-45 who are urban professionals and fashion-conscious. The current performance indicates a strong market share with a monthly revenue of approximately $1.5M, reflecting the brand's resonance with its audience. The strategy involves optimizing existing channels, amplifying reach through newer platforms like TikTok, and enhancing customer engagement to improve repeat sales.",
   "weaknesses": [
-    "High customer acquisition costs (CAC)",
-    "Fluctuating conversion rates",
-    "Limited Instagram presence",
-    "Low customer loyalty"
+    {"title": "High CAC", "description": "Current $70 CAC is high", "impact": "Reduces profitability"},
+    {"title": "Low repeat rate", "description": "Only 40% return", "impact": "Lost revenue"},
+    {"title": "Channel dependence", "description": "60% on Instagram", "impact": "Algorithm risk"},
+    {"title": "Monthly Revenue Variance", "description": "30% fluctuation linked to seasons", "impact": "Inconsistent growth"},
+    {"title": "Limited engagement in Email", "description": "Open rates at 22% are below industry standards", "impact": "Reduced audience interaction"}
   ],
   "kpis": [
-    {
-      "name": "Revenue Growth",
-      "current": 48049.79,
-      "target": 60000,
-      "timeframe_days": 90
-    },
-    {
-      "name": "Conversion Rate",
-      "current": 10.53,
-      "target": 15,
-      "timeframe_days": 90
-    },
-    {
-      "name": "Customer Lifetime Value (CLTV)",
-      "current": 600,
-      "target": 800,
-      "timeframe_days": 90
-    }
+    {"name": "CAC Reduction", "current": 70, "target": 55, "timeframe_days": 180},
+    {"name": "Repeat Purchase Rate", "current": 40, "target": 55, "timeframe_days": 365},
+    {"name": "Email Open Rate", "current": 22, "target": 28, "timeframe_days": 180},
+    {"name": "Instagram Conversion Rate", "current": 3.15, "target": 4.0, "timeframe_days": 90},
+    {"name": "Monthly Revenue Growth", "current": 1500000, "target": 1800000, "timeframe_days": 90}
   ],
   "competitors": [
-    "Zappos",
-    "ASOS"
+    {"name": "ASOS", "strength": "72% repeat rate", "weakness": "Generic brand"},
+    {"name": "Shein", "strength": "TikTok mastery", "weakness": "Quality issues"}
   ],
   "tactics": [
-    "Increase social media ads to target Women 25-45",
-    "Launch targeted email marketing campaigns",
-    "Partner with fashion influencers for wider reach",
-    "Revamp the website for better user experience",
-    "Host online contests to boost engagement",
-    "Increase content marketing efforts to drive organic traffic"
+    {"name": "Loyalty Program", "description": "Points-based system to incentivize repeat purchases", "roi_rank": 1, "difficulty": "Medium", "budget_usd": 50000},
+    {"name": "TikTok Expansion", "description": "Leverage influencer partnerships to reach new demographics", "roi_rank": 2, "difficulty": "Medium", "budget_usd": 100000},
+    {"name": "Email Optimization", "description": "Implement segmentation & personalization for targeted messaging", "roi_rank": 3, "difficulty": "Low", "budget_usd": 20000},
+    {"name": "SEO Investment", "description": "Focus on organic traffic growth through targeted keywords", "roi_rank": 4, "difficulty": "High", "budget_usd": 30000},
+    {"name": "Pinterest Advertising", "description": "Utilize visual discovery ads to capture fashion interest", "roi_rank": 5, "difficulty": "Medium", "budget_usd": 30000}
   ],
   "budget": {
-    "content_marketing": 100000,
-    "social_media_ads": 150000,
-    "influencer_partnerships": 120000,
-    "website_optimization": 150000,
-    "online_contests": 60000
+    "total_usd": 580000,
+    "items": [
+      {"category": "Instagram", "usd": 350000},
+      {"category": "TikTok", "usd": 100000},
+      {"category": "Loyalty", "usd": 50000},
+      {"category": "Email", "usd": 20000},
+      {"category": "Google Ads", "usd": 30000},
+      {"category": "SEO", "usd": 30000}
+    ]
   },
-  "benchmarks": [],
-  "assumptions": []
+  "benchmarks": [
+    "Industry avg CAC: $50-60",
+    "Industry avg repeat rate: 60-70%",
+    "Industry avg email open: 25-30%"
+  ],
+  "assumptions": [
+    "Monthly budget remains $580K",
+    "AOV stable at $162.50",
+    "No major platform algorithm changes"
+  ]
 }

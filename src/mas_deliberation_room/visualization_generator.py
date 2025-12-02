@@ -24,7 +24,7 @@ plt.rcParams["font.size"] = 10
 
 
 class DiversityMetrics:
-    """Calculate diversity metrics for agent outputs."""
+    # Calculate diversity metrics for agent outputs.
     
     @staticmethod
     def calculate_vocabulary_diversity(text1: str, text2: str) -> float:
@@ -130,7 +130,7 @@ class VisualizationGenerator:
             if res.get("rubric_percent") is not None
         ]
         if not data:
-            print("⚠️  Skipping quality comparison (no rubric data).")
+            print("[WARN] Skipping quality comparison (no rubric data).")
             return
 
         labels, values = zip(*sorted(data))
@@ -154,7 +154,7 @@ class VisualizationGenerator:
         plt.tight_layout()
         plt.savefig(self.output_dir / "quality_comparison.png", dpi=300, bbox_inches="tight")
         plt.close()
-        print("✅ Created quality_comparison.png")
+        print("[OK] Created quality_comparison.png")
 
     def create_execution_time_chart(self):
         """Bar chart comparing execution time."""
@@ -164,7 +164,7 @@ class VisualizationGenerator:
             if res.get("execution_time_seconds") is not None
         ]
         if not data:
-            print("⚠️  Skipping execution time comparison (no timing data).")
+            print("[WARN] Skipping execution time comparison (no timing data).")
             return
 
         labels, values = zip(*sorted(data))
@@ -185,14 +185,14 @@ class VisualizationGenerator:
         plt.tight_layout()
         plt.savefig(self.output_dir / "execution_time_comparison.png", dpi=300, bbox_inches="tight")
         plt.close()
-        print("✅ Created execution_time_comparison.png")
+        print("[OK] Created execution_time_comparison.png")
 
     def create_diversity_lift_chart(self):
         """Show how diversity (multi-agent) changes quality/content vs single."""
         single = self.latest_by_mode.get("single")
         multi = self.latest_by_mode.get("multi")
         if not single or not multi:
-            print("⚠️  Skipping diversity lift (need both single and multi runs).")
+            print("[WARN] Skipping diversity lift (need both single and multi runs).")
             return
 
         metrics = {}
@@ -212,7 +212,7 @@ class VisualizationGenerator:
                 metrics["Content Edit Ratio"] = ref["edit_ratio"] * 100  # Convert to %
 
         if not metrics:
-            print("⚠️  Skipping diversity lift (no comparison metrics found).")
+            print("[WARN] Skipping diversity lift (no comparison metrics found).")
             return
 
         labels = list(metrics.keys())
@@ -234,7 +234,7 @@ class VisualizationGenerator:
         plt.tight_layout()
         plt.savefig(self.output_dir / "diversity_lift.png", dpi=300, bbox_inches="tight")
         plt.close()
-        print("✅ Created diversity_lift.png")
+        print("[OK] Created diversity_lift.png")
 
     def create_strategic_element_comparison(self):
         """Compare strategic elements between single and multi-agent outputs."""
@@ -242,7 +242,7 @@ class VisualizationGenerator:
         multi_text = self._load_strategy_file("final_strategy.txt") or self._load_strategy_file("final_strategy.json")
         
         if not single_text or not multi_text:
-            print("⚠️  Skipping strategic element comparison (missing output files).")
+            print("[WARN] Skipping strategic element comparison (missing output files).")
             return
         
         single_elements = self.diversity_calc.count_strategic_elements(single_text)
@@ -279,7 +279,7 @@ class VisualizationGenerator:
         plt.tight_layout()
         plt.savefig(self.output_dir / "strategic_elements.png", dpi=300, bbox_inches="tight")
         plt.close()
-        print("✅ Created strategic_elements.png")
+        print("[OK] Created strategic_elements.png")
 
     def create_content_diversity_heatmap(self):
         """Create heatmap showing content evolution across agent stages."""
@@ -289,7 +289,7 @@ class VisualizationGenerator:
         gemini_text = self._load_strategy_file("final_strategy.txt") or self._load_strategy_file("final_strategy.json")
         
         if not all([openai_text, claude_text, gemini_text]):
-            print("⚠️  Skipping content diversity heatmap (missing multi-agent outputs).")
+            print("[WARN] Skipping content diversity heatmap (missing multi-agent outputs).")
             return
         
         # Calculate edit ratios
@@ -312,26 +312,29 @@ class VisualizationGenerator:
         fig, ax = plt.subplots(figsize=(9, 7))
         im = ax.imshow(data, cmap='YlOrRd', aspect='auto', vmin=0, vmax=1)
         
-        agents = ['OpenAI\n(Analyst)', 'Claude\n(Creative)', 'Gemini\n(Operations)']
+        agents = ['Phase 1:\nOpenAI Analyst\n(Baseline)', 'Phase 2:\nClaude Creative\n(Enhancement)', 'Phase 3:\nGemini Operations\n(Finalization)']
         ax.set_xticks(np.arange(len(agents)))
         ax.set_yticks(np.arange(len(agents)))
-        ax.set_xticklabels(agents)
-        ax.set_yticklabels(agents)
-        
-        # Annotate cells
+        ax.set_xticklabels(agents, fontsize=10)
+        ax.set_yticklabels(agents, fontsize=10)
+
+        # Annotate cells with percentages
         for i in range(len(agents)):
             for j in range(len(agents)):
                 if i != j:
-                    text = ax.text(j, i, f'{data[i, j]:.2f}',
-                                 ha="center", va="center", color="black", fontweight='bold')
-        
-        ax.set_title("Content Edit Ratio Between Agents\n(Higher = More Change)", 
-                    fontsize=14, fontweight='bold')
-        fig.colorbar(im, ax=ax, label='Edit Ratio (0=identical, 1=completely different)')
+                    percentage = data[i, j] * 100
+                    text = ax.text(j, i, f'{percentage:.0f}%',
+                                 ha="center", va="center", color="black", fontweight='bold', fontsize=12)
+
+        ax.set_title("Multi-Agent Deliberation: Content Evolution Across Phases\n(Shows how each agent transforms the strategy)",
+                    fontsize=13, fontweight='bold', pad=15)
+        cbar = fig.colorbar(im, ax=ax, label='Content Change (%)')
+        cbar.set_ticks([0, 0.25, 0.5, 0.75, 1.0])
+        cbar.set_ticklabels(['0%\n(identical)', '25%', '50%', '75%', '100%\n(different)'])
         plt.tight_layout()
         plt.savefig(self.output_dir / "content_diversity_heatmap.png", dpi=300, bbox_inches="tight")
         plt.close()
-        print("✅ Created content_diversity_heatmap.png")
+        print("[OK] Created content_diversity_heatmap.png")
 
     def create_efficiency_tradeoff_scatter(self):
         """Scatter plot showing quality vs speed tradeoff."""
@@ -348,7 +351,7 @@ class VisualizationGenerator:
                 })
         
         if len(data_points) < 2:
-            print("⚠️  Skipping efficiency tradeoff (need both modes).")
+            print("[WARN] Skipping efficiency tradeoff (need both modes).")
             return
         
         fig, ax = plt.subplots(figsize=(10, 7))
@@ -380,7 +383,7 @@ class VisualizationGenerator:
         plt.tight_layout()
         plt.savefig(self.output_dir / "efficiency_tradeoff.png", dpi=300, bbox_inches="tight")
         plt.close()
-        print("✅ Created efficiency_tradeoff.png")
+        print("[OK] Created efficiency_tradeoff.png")
 
     def create_comprehensive_comparison_table(self):
         """Create a visual comparison table of key metrics."""
@@ -388,7 +391,7 @@ class VisualizationGenerator:
         multi = self.latest_by_mode.get("multi") or {}
         
         if not single or not multi:
-            print("⚠️  Skipping comparison table (need both modes).")
+            print("[WARN] Skipping comparison table (need both modes).")
             return
         
         metrics = {
@@ -401,8 +404,8 @@ class VisualizationGenerator:
                 multi.get("execution_time_seconds", 0)
             ),
             "Schema Valid": (
-                "✓" if single.get("schema_valid") else "✗",
-                "✓" if multi.get("schema_valid") else "✗"
+                "[Y]" if single.get("schema_valid") else "[N]",
+                "[Y]" if multi.get("schema_valid") else "[N]"
             ),
             "KPI Delta": (
                 0,
@@ -447,7 +450,7 @@ class VisualizationGenerator:
         # Color code changes
         for i in range(1, len(table_data)):
             delta_cell = table[(i, 3)]
-            if table_data[i][3] not in ["—", "✓", "✗"]:
+            if table_data[i][3] not in ["—", "[Y]", "[N]"]:
                 try:
                     val = float(table_data[i][3].replace("+", ""))
                     if val > 0:
@@ -462,7 +465,7 @@ class VisualizationGenerator:
         plt.tight_layout()
         plt.savefig(self.output_dir / "comparison_table.png", dpi=300, bbox_inches="tight")
         plt.close()
-        print("✅ Created comparison_table.png")
+        print("[OK] Created comparison_table.png")
 
     def generate_all_visualizations(self):
         """Generate all visualizations."""
@@ -482,14 +485,14 @@ class VisualizationGenerator:
         
         for name, method in viz_methods:
             try:
-                print(f"📊 Generating {name}...")
+                print(f"[VIZ] Generating {name}...")
                 method()
             except Exception as e:
-                print(f"❌ Error generating {name}: {e}")
-        
+                print(f"[ERROR] Error generating {name}: {e}")
+
         print("\n" + "=" * 70)
-        print(f"✅ Visualization generation complete!")
-        print(f"📁 Files saved in: {self.output_dir.absolute()}/")
+        print(f"[SUCCESS] Visualization generation complete!")
+        print(f"[INFO] Files saved in: {self.output_dir.absolute()}/")
         print("=" * 70 + "\n")
 
 
@@ -499,13 +502,13 @@ def main():
         generator = VisualizationGenerator()
         generator.generate_all_visualizations()
     except FileNotFoundError as e:
-        print(f"\n❌ Error: {e}")
-        print("\n💡 To generate visualizations:")
+        print(f"\n[ERROR] Error: {e}")
+        print("\n[INFO] To generate visualizations:")
         print("   1. Run: python main.py (will run multi-agent by default)")
         print("   2. Run: python main.py --mode single (for single-agent)")
         print("   3. Then run this script again\n")
     except Exception as e:
-        print(f"\n❌ Unexpected error: {e}")
+        print(f"\n[ERROR] Unexpected error: {e}")
         raise
 
 

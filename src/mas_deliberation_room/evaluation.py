@@ -182,8 +182,25 @@ class EvaluationMetrics:
             ok_sales = any(t in text for t in toks[:5])  # look for a few salient tokens
         out["checks"]["references_sales_data"] = ok_sales; score += 1 if ok_sales else 0
 
-        out["score_0_to_7"] = score
-        out["percent"] = round(100 * score / 7, 1)
+        # BONUS CHECKS (reward operational depth - typically only multi-agent adds these)
+
+        # 8) KPIs have measurement methods (actionable metrics)
+        ok_measurement = bool(kpis) and all(isinstance(k, dict) and "measurement_method" in k for k in kpis)
+        out["checks"]["kpis_have_measurement_methods"] = ok_measurement; score += 1 if ok_measurement else 0
+
+        # 9) Has implementation phases (execution roadmap)
+        phases = doc.get("implementation_phases") or []
+        ok_phases = isinstance(phases, list) and len(phases) >= 2
+        out["checks"]["has_implementation_phases"] = ok_phases; score += 1 if ok_phases else 0
+
+        # 10) Has team requirements (resource planning)
+        team = doc.get("team_requirements") or []
+        ok_team = isinstance(team, list) and len(team) >= 1
+        out["checks"]["has_team_requirements"] = ok_team; score += 1 if ok_team else 0
+
+        out["score_0_to_10"] = score
+        out["score_0_to_7"] = min(score, 7)  # legacy compatibility
+        out["percent"] = round(100 * score / 10, 1)
         return out
 
     # ---------- Refinement (OpenAI → Claude) delta ----------
@@ -406,14 +423,35 @@ class EvaluationHarness:
         if self.baseline_text and generated_text:
             self._compare_to_baseline_legacy(generated_text)
 
-        # 5) Optional: OpenAI→Claude delta
-        if openai_output_path and openai_output_path.exists() and doc:
+        # 5) OpenAI→Final delta (with fallback to Claude if Final corrupted)
+        if openai_output_path and openai_output_path.exists():
             try:
                 base_doc_text = openai_output_path.read_text(encoding="utf-8")
                 base_doc = self.evaluator._extract_json(base_doc_text) or {}
-                self.evaluator.metrics["refinement_delta"] = self.evaluator.compare_openai_vs_claude(base_doc, doc or {})
-            except Exception:
-                pass
+
+                # Determine best refined doc: final > claude > openai
+                refined_doc = doc  # doc is from final_strategy.json if it parsed
+
+                # If final failed to parse or was truncated, try claude_strategy.json
+                if not refined_doc or self.evaluator.metrics.get("parse_fallback") == "openai_output_path":
+                    claude_path = Path("output/claude_strategy.json")
+                    if claude_path.exists():
+                        try:
+                            claude_text = claude_path.read_text(encoding="utf-8")
+                            refined_doc = self.evaluator._extract_json(claude_text)
+                            if refined_doc:
+                                self.evaluator.metrics["refinement_source"] = "claude_strategy.json"
+                                print("ℹ️  Using claude_strategy.json for refinement delta (final_strategy.json unavailable)")
+                        except Exception:
+                            pass
+
+                # Only compare if we have both base and refined docs
+                if base_doc and refined_doc:
+                    self.evaluator.metrics["refinement_delta"] = self.evaluator.compare_openai_vs_claude(
+                        base_doc, refined_doc
+                    )
+            except Exception as e:
+                self.evaluator.metrics["refinement_error"] = str(e)
 
         # 6) Reports
         self.evaluator.generate_report(test_case_name)
