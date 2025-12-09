@@ -1,21 +1,31 @@
 #!/usr/bin/env python
 """
 Enhanced Visualization Generator for Marketing Strategy System
-Creates comprehensive charts comparing single vs multi-agent runs with diversity metrics.
+
+Improvements:
+- Statistical annotations on figures (Feedback Item #14)
+- Multi-run comparison support (Feedback Item #1)
+- Formalized divergence visualization (Feedback Item #6)
+- Ablation study visualizations (Feedback Item #2)
 """
 
 import matplotlib
-
-# Use a non-interactive backend to avoid Tcl/Tk errors in threaded/CLI runs
 matplotlib.use("Agg")
 
 import json
 from pathlib import Path
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Any
 import matplotlib.pyplot as plt
 import seaborn as sns
 import numpy as np
 from collections import Counter
+
+# Optional scipy for statistics
+try:
+    from scipy import stats as scipy_stats
+    SCIPY_AVAILABLE = True
+except ImportError:
+    SCIPY_AVAILABLE = False
 
 # Set style
 sns.set_style("whitegrid")
@@ -24,7 +34,7 @@ plt.rcParams["font.size"] = 10
 
 
 class DiversityMetrics:
-    # Calculate diversity metrics for agent outputs.
+    """Calculate diversity metrics for agent outputs."""
     
     @staticmethod
     def calculate_vocabulary_diversity(text1: str, text2: str) -> float:
@@ -39,13 +49,11 @@ class DiversityMetrics:
     
     @staticmethod
     def calculate_edit_ratio(original: str, modified: str) -> float:
-        """Estimate how much content changed (simple word-based)."""
+        """Estimate how much content changed."""
         words_orig = original.lower().split()
         words_mod = modified.lower().split()
         if not words_orig:
             return 1.0
-        
-        # Simple Levenshtein-like ratio at word level
         common = len(set(words_orig) & set(words_mod))
         return 1.0 - (common / len(words_orig))
     
@@ -65,23 +73,51 @@ class DiversityMetrics:
 
 
 class VisualizationGenerator:
-    """Generate comprehensive visualizations for agent-mode comparisons."""
+    """Generate comprehensive visualizations with statistical annotations."""
 
     def __init__(self, output_dir: str = "output"):
         self.output_dir = Path(output_dir)
         self.output_dir.mkdir(exist_ok=True)
-        self.results_file = self.output_dir / "agent_mode_results.json"
         
-        if not self.results_file.exists():
-            raise FileNotFoundError(
-                "agent_mode_results.json not found. Run both single and multi-agent modes first."
-            )
-
-        with open(self.results_file, "r", encoding="utf-8") as f:
-            raw = json.load(f)
-        self.results: List[Dict] = raw if isinstance(raw, list) else []
+        # Load various result files
+        self.results_file = self.output_dir / "agent_mode_results.json"
+        self.multi_run_file = self.output_dir / "multi_run_statistics.json"
+        self.comparison_file = self.output_dir / "statistical_comparison.json"
+        self.ablation_file = self.output_dir / "ablation_results.json"
+        self.ordering_file = self.output_dir / "ordering_experiment.json"
+        
+        self.results: List[Dict] = []
+        self.multi_run_data: Optional[Dict] = None
+        self.comparison_data: Optional[Dict] = None
+        self.ablation_data: Optional[Dict] = None
+        self.ordering_data: Optional[Dict] = None
+        
+        self._load_data()
         self.latest_by_mode = self._latest_by_mode()
         self.diversity_calc = DiversityMetrics()
+
+    def _load_data(self):
+        """Load all available data files."""
+        if self.results_file.exists():
+            with open(self.results_file, "r", encoding="utf-8") as f:
+                raw = json.load(f)
+            self.results = raw if isinstance(raw, list) else []
+        
+        if self.multi_run_file.exists():
+            with open(self.multi_run_file, "r", encoding="utf-8") as f:
+                self.multi_run_data = json.load(f)
+        
+        if self.comparison_file.exists():
+            with open(self.comparison_file, "r", encoding="utf-8") as f:
+                self.comparison_data = json.load(f)
+        
+        if self.ablation_file.exists():
+            with open(self.ablation_file, "r", encoding="utf-8") as f:
+                self.ablation_data = json.load(f)
+        
+        if self.ordering_file.exists():
+            with open(self.ordering_file, "r", encoding="utf-8") as f:
+                self.ordering_data = json.load(f)
 
     def _latest_by_mode(self) -> Dict[str, Dict]:
         """Pick the most recent result per agent_mode."""
@@ -96,10 +132,7 @@ class VisualizationGenerator:
         return latest
 
     def _load_strategy_file(self, filename: str) -> Optional[str]:
-        """
-        Load a strategy output file if it exists (supports .txt or .json with strategy_text).
-        Returns plain string content or None.
-        """
+        """Load strategy output file."""
         path = self.output_dir / filename
         if path.exists():
             text = path.read_text(encoding="utf-8")
@@ -111,16 +144,256 @@ class VisualizationGenerator:
                 except Exception:
                     pass
             return text
-        # Try json fallback for legacy filenames
-        alt_json = path.with_suffix(".json")
-        if not path.suffix and alt_json.exists():
-            try:
-                doc = json.loads(alt_json.read_text(encoding="utf-8"))
-                if isinstance(doc, dict) and doc.get("strategy_text"):
-                    return doc["strategy_text"]
-            except Exception:
-                return None
         return None
+
+    def _add_significance_annotation(self, ax, p_value: float, x_pos: float, y_pos: float):
+        """Add significance stars to a plot."""
+        if p_value < 0.001:
+            stars = "***"
+        elif p_value < 0.01:
+            stars = "**"
+        elif p_value < 0.05:
+            stars = "*"
+        else:
+            stars = "ns"
+        
+        ax.annotate(stars, xy=(x_pos, y_pos), ha='center', fontsize=14, fontweight='bold')
+
+    # =========================================================================
+    # MULTI-RUN STATISTICAL VISUALIZATIONS
+    # =========================================================================
+
+    def create_multi_run_distribution(self):
+        """
+        Create distribution plot for multi-run results.
+        Shows violin/box plots with individual points.
+        """
+        if not self.multi_run_data:
+            print("[WARN] Skipping multi-run distribution (no multi-run data).")
+            return
+        
+        runs = self.multi_run_data.get("individual_runs", [])
+        valid_runs = [r for r in runs if "error" not in r and r.get("rubric_percent") is not None]
+        
+        if len(valid_runs) < 3:
+            print("[WARN] Skipping multi-run distribution (need at least 3 successful runs).")
+            return
+        
+        scores = [r["rubric_percent"] for r in valid_runs]
+        
+        fig, ax = plt.subplots(figsize=(8, 6))
+        
+        # Violin plot
+        parts = ax.violinplot([scores], positions=[1], showmeans=True, showmedians=True)
+        parts['bodies'][0].set_facecolor('#2E86AB')
+        parts['bodies'][0].set_alpha(0.7)
+        
+        # Overlay individual points
+        jitter = np.random.normal(0, 0.04, len(scores))
+        ax.scatter([1 + j for j in jitter], scores, alpha=0.6, c='#E63946', s=50, zorder=5)
+        
+        # Statistics annotation
+        stats = self.multi_run_data.get("statistics", {}).get("rubric", {})
+        mean = stats.get("mean", np.mean(scores))
+        std = stats.get("std", np.std(scores))
+        
+        ax.axhline(y=mean, color='green', linestyle='--', alpha=0.7, label=f'Mean: {mean:.1f}%')
+        ax.fill_between([0.5, 1.5], mean-std, mean+std, alpha=0.2, color='green', label=f'±1 SD: {std:.1f}')
+        
+        ax.set_xlim(0.5, 1.5)
+        ax.set_xticks([1])
+        ax.set_xticklabels([self.multi_run_data.get("mode", "Multi").capitalize()])
+        ax.set_ylabel("Rubric Score (%)", fontsize=12, fontweight='bold')
+        ax.set_title(f"Score Distribution Across {len(valid_runs)} Runs\n(Mean ± SD: {mean:.1f} ± {std:.1f}%)", 
+                    fontsize=14, fontweight='bold')
+        ax.legend(loc='upper right')
+        ax.grid(axis='y', alpha=0.3)
+        
+        plt.tight_layout()
+        plt.savefig(self.output_dir / "multi_run_distribution.png", dpi=300, bbox_inches="tight")
+        plt.close()
+        print("[OK] Created multi_run_distribution.png")
+
+    def create_statistical_comparison_chart(self):
+        """
+        Create bar chart with error bars and significance testing.
+        Compares single vs multi-agent with confidence intervals.
+        """
+        if not self.comparison_data:
+            print("[WARN] Skipping statistical comparison (no comparison data).")
+            return
+        
+        single_stats = self.comparison_data.get("single_agent", {}).get("rubric", {})
+        multi_stats = self.comparison_data.get("multi_agent", {}).get("rubric", {})
+        comparison = self.comparison_data.get("comparison", {})
+        
+        if not single_stats or not multi_stats:
+            print("[WARN] Skipping statistical comparison (incomplete statistics).")
+            return
+        
+        fig, ax = plt.subplots(figsize=(10, 7))
+        
+        labels = ['Single Agent', 'Multi Agent']
+        means = [single_stats.get("mean", 0), multi_stats.get("mean", 0)]
+        stds = [single_stats.get("std", 0), multi_stats.get("std", 0)]
+        
+        colors = ['#2E86AB', '#F18F01']
+        x = np.arange(len(labels))
+        
+        bars = ax.bar(x, means, yerr=stds, capsize=8, color=colors, 
+                      edgecolor='black', linewidth=1.5, alpha=0.8)
+        
+        # Add individual values as text
+        for i, (bar, mean, std) in enumerate(zip(bars, means, stds)):
+            ax.text(bar.get_x() + bar.get_width()/2, bar.get_height() + std + 2,
+                   f'{mean:.1f}%\n(±{std:.1f})', ha='center', fontsize=11, fontweight='bold')
+        
+        # Add significance annotation if available
+        t_test = comparison.get("t_test", {})
+        if t_test:
+            p_value = t_test.get("p_value", 1.0)
+            max_height = max(means) + max(stds) + 10
+            
+            # Draw significance bracket
+            ax.plot([0, 0, 1, 1], [max_height-2, max_height, max_height, max_height-2], 
+                   'k-', linewidth=1.5)
+            
+            self._add_significance_annotation(ax, p_value, 0.5, max_height + 2)
+            
+            # Add p-value text
+            ax.text(0.5, max_height + 6, f'p = {p_value:.4f}', ha='center', fontsize=10)
+        
+        # Effect size annotation
+        effect = comparison.get("effect_size", {})
+        if effect:
+            cohens_d = effect.get("cohens_d", 0)
+            interp = effect.get("interpretation", "")
+            ax.text(0.98, 0.02, f"Cohen's d = {cohens_d:.2f} ({interp})",
+                   transform=ax.transAxes, ha='right', fontsize=10,
+                   bbox=dict(boxstyle='round', facecolor='wheat', alpha=0.5))
+        
+        ax.set_ylabel("Rubric Score (%)", fontsize=12, fontweight='bold')
+        ax.set_title("Single vs Multi-Agent: Statistical Comparison\n(Error bars show ±1 SD)", 
+                    fontsize=14, fontweight='bold')
+        ax.set_xticks(x)
+        ax.set_xticklabels(labels, fontsize=12)
+        ax.set_ylim(0, max(means) + max(stds) + 20)
+        ax.axhline(y=85, color='green', linestyle='--', alpha=0.5, label='Target: 85%')
+        ax.legend(loc='upper left')
+        ax.grid(axis='y', alpha=0.3)
+        
+        plt.tight_layout()
+        plt.savefig(self.output_dir / "statistical_comparison.png", dpi=300, bbox_inches="tight")
+        plt.close()
+        print("[OK] Created statistical_comparison.png")
+
+    # =========================================================================
+    # ABLATION STUDY VISUALIZATIONS
+    # =========================================================================
+
+    def create_ablation_comparison(self):
+        """Create bar chart comparing ablation configurations."""
+        if not self.ablation_data:
+            print("[WARN] Skipping ablation comparison (no ablation data).")
+            return
+        
+        results = self.ablation_data.get("results_by_config", {})
+        if not results:
+            print("[WARN] Skipping ablation comparison (empty results).")
+            return
+        
+        fig, ax = plt.subplots(figsize=(12, 7))
+        
+        configs = list(results.keys())
+        means = []
+        stds = []
+        
+        for config in configs:
+            stats = results[config].get("statistics", {}).get("rubric", {})
+            means.append(stats.get("mean", 0))
+            stds.append(stats.get("std", 0))
+        
+        x = np.arange(len(configs))
+        colors = plt.cm.viridis(np.linspace(0.2, 0.8, len(configs)))
+        
+        bars = ax.bar(x, means, yerr=stds, capsize=6, color=colors,
+                      edgecolor='black', linewidth=1.5)
+        
+        # Add value labels
+        for bar, mean, std in zip(bars, means, stds):
+            ax.text(bar.get_x() + bar.get_width()/2, bar.get_height() + std + 1,
+                   f'{mean:.1f}%', ha='center', fontsize=10, fontweight='bold')
+        
+        # Format config names for display
+        display_names = [c.replace('_', '\n') for c in configs]
+        
+        ax.set_ylabel("Rubric Score (%)", fontsize=12, fontweight='bold')
+        ax.set_title("Ablation Study: Configuration Comparison\n(Error bars show ±1 SD)", 
+                    fontsize=14, fontweight='bold')
+        ax.set_xticks(x)
+        ax.set_xticklabels(display_names, fontsize=10, rotation=0)
+        ax.grid(axis='y', alpha=0.3)
+        
+        plt.tight_layout()
+        plt.savefig(self.output_dir / "ablation_comparison.png", dpi=300, bbox_inches="tight")
+        plt.close()
+        print("[OK] Created ablation_comparison.png")
+
+    # =========================================================================
+    # ORDERING EXPERIMENT VISUALIZATIONS
+    # =========================================================================
+
+    def create_ordering_comparison(self):
+        """Create chart comparing different agent orderings."""
+        if not self.ordering_data:
+            print("[WARN] Skipping ordering comparison (no ordering data).")
+            return
+        
+        results = self.ordering_data.get("results_by_ordering", {})
+        if not results:
+            print("[WARN] Skipping ordering comparison (empty results).")
+            return
+        
+        fig, ax = plt.subplots(figsize=(14, 7))
+        
+        orderings = list(results.keys())
+        means = []
+        stds = []
+        agent_orders = []
+        
+        for ordering in orderings:
+            stats = results[ordering].get("statistics", {}).get("rubric", {})
+            means.append(stats.get("mean", 0))
+            stds.append(stats.get("std", 0))
+            agent_orders.append(" → ".join(results[ordering].get("agent_order", [])))
+        
+        x = np.arange(len(orderings))
+        colors = plt.cm.Set2(np.linspace(0, 1, len(orderings)))
+        
+        bars = ax.bar(x, means, yerr=stds, capsize=6, color=colors,
+                      edgecolor='black', linewidth=1.5)
+        
+        # Add value labels
+        for bar, mean, std in zip(bars, means, stds):
+            ax.text(bar.get_x() + bar.get_width()/2, bar.get_height() + std + 1,
+                   f'{mean:.1f}%', ha='center', fontsize=10, fontweight='bold')
+        
+        ax.set_ylabel("Rubric Score (%)", fontsize=12, fontweight='bold')
+        ax.set_title("Pipeline Ordering Experiment\n(Testing agent sequence effects)", 
+                    fontsize=14, fontweight='bold')
+        ax.set_xticks(x)
+        ax.set_xticklabels([f"{o}\n({ao})" for o, ao in zip(orderings, agent_orders)], 
+                          fontsize=9, rotation=0)
+        ax.grid(axis='y', alpha=0.3)
+        
+        plt.tight_layout()
+        plt.savefig(self.output_dir / "ordering_comparison.png", dpi=300, bbox_inches="tight")
+        plt.close()
+        print("[OK] Created ordering_comparison.png")
+
+    # =========================================================================
+    # ORIGINAL VISUALIZATIONS (ENHANCED)
+    # =========================================================================
 
     def create_quality_comparison(self):
         """Bar chart comparing rubric percent for single vs multi."""
@@ -188,7 +461,7 @@ class VisualizationGenerator:
         print("[OK] Created execution_time_comparison.png")
 
     def create_diversity_lift_chart(self):
-        """Show how diversity (multi-agent) changes quality/content vs single."""
+        """Show diversity impact of multi-agent vs single."""
         single = self.latest_by_mode.get("single")
         multi = self.latest_by_mode.get("multi")
         if not single or not multi:
@@ -197,11 +470,9 @@ class VisualizationGenerator:
 
         metrics = {}
         
-        # Quality lift
         if single.get("rubric_percent") is not None and multi.get("rubric_percent") is not None:
             metrics["Rubric % Lift"] = multi["rubric_percent"] - single["rubric_percent"]
 
-        # Refinement deltas
         ref = multi.get("refinement_delta") or {}
         if isinstance(ref, dict):
             if ref.get("kpis_delta") is not None:
@@ -209,7 +480,7 @@ class VisualizationGenerator:
             if ref.get("tactics_delta") is not None:
                 metrics["Tactics Count Delta"] = ref["tactics_delta"]
             if ref.get("edit_ratio") is not None:
-                metrics["Content Edit Ratio"] = ref["edit_ratio"] * 100  # Convert to %
+                metrics["Content Edit Ratio"] = ref["edit_ratio"] * 100
 
         if not metrics:
             print("[WARN] Skipping diversity lift (no comparison metrics found).")
@@ -236,73 +507,20 @@ class VisualizationGenerator:
         plt.close()
         print("[OK] Created diversity_lift.png")
 
-    def create_strategic_element_comparison(self):
-        """Compare strategic elements between single and multi-agent outputs."""
-        single_text = self._load_strategy_file("openai_strategy.txt") or self._load_strategy_file("openai_strategy.json")
-        multi_text = self._load_strategy_file("final_strategy.txt") or self._load_strategy_file("final_strategy.json")
-        
-        if not single_text or not multi_text:
-            print("[WARN] Skipping strategic element comparison (missing output files).")
-            return
-        
-        single_elements = self.diversity_calc.count_strategic_elements(single_text)
-        multi_elements = self.diversity_calc.count_strategic_elements(multi_text)
-        
-        categories = list(single_elements.keys())
-        single_vals = [single_elements[c] for c in categories]
-        multi_vals = [multi_elements[c] for c in categories]
-        
-        x = np.arange(len(categories))
-        width = 0.35
-        
-        fig, ax = plt.subplots(figsize=(12, 7))
-        bars1 = ax.bar(x - width/2, single_vals, width, label='Single Agent', 
-                       color='#2E86AB', edgecolor='black', linewidth=1.5)
-        bars2 = ax.bar(x + width/2, multi_vals, width, label='Multi Agent', 
-                       color='#F18F01', edgecolor='black', linewidth=1.5)
-        
-        ax.set_ylabel('Mention Count', fontsize=12, fontweight='bold')
-        ax.set_title('Strategic Element Coverage: Single vs Multi-Agent', fontsize=14, fontweight='bold')
-        ax.set_xticks(x)
-        ax.set_xticklabels([c.replace("_", " ").title() for c in categories], rotation=15, ha='right')
-        ax.legend()
-        ax.grid(axis='y', alpha=0.3)
-        
-        # Add value labels
-        for bars in [bars1, bars2]:
-            for bar in bars:
-                height = bar.get_height()
-                if height > 0:
-                    ax.text(bar.get_x() + bar.get_width()/2, height + 0.3,
-                           f'{int(height)}', ha='center', va='bottom', fontsize=9)
-        
-        plt.tight_layout()
-        plt.savefig(self.output_dir / "strategic_elements.png", dpi=300, bbox_inches="tight")
-        plt.close()
-        print("[OK] Created strategic_elements.png")
-
     def create_content_diversity_heatmap(self):
         """Create heatmap showing content evolution across agent stages."""
-        # Load all three stages for multi-agent
-        openai_text = self._load_strategy_file("openai_strategy.txt") or self._load_strategy_file("openai_strategy.json")
-        claude_text = self._load_strategy_file("claude_strategy.txt") or self._load_strategy_file("claude_strategy.json")
-        gemini_text = self._load_strategy_file("final_strategy.txt") or self._load_strategy_file("final_strategy.json")
+        openai_text = self._load_strategy_file("openai_strategy.json")
+        claude_text = self._load_strategy_file("claude_strategy.json")
+        gemini_text = self._load_strategy_file("final_strategy.json")
         
         if not all([openai_text, claude_text, gemini_text]):
             print("[WARN] Skipping content diversity heatmap (missing multi-agent outputs).")
             return
         
-        # Calculate edit ratios
         openai_to_claude = self.diversity_calc.calculate_edit_ratio(openai_text, claude_text)
         claude_to_gemini = self.diversity_calc.calculate_edit_ratio(claude_text, gemini_text)
         openai_to_gemini = self.diversity_calc.calculate_edit_ratio(openai_text, gemini_text)
         
-        # Calculate vocabulary diversity
-        vocab_oc = self.diversity_calc.calculate_vocabulary_diversity(openai_text, claude_text)
-        vocab_cg = self.diversity_calc.calculate_vocabulary_diversity(claude_text, gemini_text)
-        vocab_og = self.diversity_calc.calculate_vocabulary_diversity(openai_text, gemini_text)
-        
-        # Create heatmap data
         data = np.array([
             [0, openai_to_claude, openai_to_gemini],
             [openai_to_claude, 0, claude_to_gemini],
@@ -312,81 +530,31 @@ class VisualizationGenerator:
         fig, ax = plt.subplots(figsize=(9, 7))
         im = ax.imshow(data, cmap='YlOrRd', aspect='auto', vmin=0, vmax=1)
         
-        agents = ['Phase 1:\nOpenAI Analyst\n(Baseline)', 'Phase 2:\nClaude Creative\n(Enhancement)', 'Phase 3:\nGemini Operations\n(Finalization)']
+        agents = ['Phase 1:\nOpenAI', 'Phase 2:\nClaude', 'Phase 3:\nGemini']
         ax.set_xticks(np.arange(len(agents)))
         ax.set_yticks(np.arange(len(agents)))
         ax.set_xticklabels(agents, fontsize=10)
         ax.set_yticklabels(agents, fontsize=10)
 
-        # Annotate cells with percentages
         for i in range(len(agents)):
             for j in range(len(agents)):
                 if i != j:
                     percentage = data[i, j] * 100
-                    text = ax.text(j, i, f'{percentage:.0f}%',
-                                 ha="center", va="center", color="black", fontweight='bold', fontsize=12)
+                    ax.text(j, i, f'{percentage:.0f}%',
+                           ha="center", va="center", color="black", fontweight='bold', fontsize=12)
 
-        ax.set_title("Multi-Agent Deliberation: Content Evolution Across Phases\n(Shows how each agent transforms the strategy)",
-                    fontsize=13, fontweight='bold', pad=15)
-        cbar = fig.colorbar(im, ax=ax, label='Content Change (%)')
+        ax.set_title("Content Evolution Across Phases\n(Jaccard Distance)", fontsize=13, fontweight='bold')
+        cbar = fig.colorbar(im, ax=ax, label='Content Divergence')
         cbar.set_ticks([0, 0.25, 0.5, 0.75, 1.0])
-        cbar.set_ticklabels(['0%\n(identical)', '25%', '50%', '75%', '100%\n(different)'])
+        cbar.set_ticklabels(['0%', '25%', '50%', '75%', '100%'])
+        
         plt.tight_layout()
         plt.savefig(self.output_dir / "content_diversity_heatmap.png", dpi=300, bbox_inches="tight")
         plt.close()
         print("[OK] Created content_diversity_heatmap.png")
 
-    def create_efficiency_tradeoff_scatter(self):
-        """Scatter plot showing quality vs speed tradeoff."""
-        data_points = []
-        for mode, res in self.latest_by_mode.items():
-            quality = res.get("rubric_percent")
-            time = res.get("execution_time_seconds")
-            if quality is not None and time is not None:
-                data_points.append({
-                    "mode": mode.capitalize(),
-                    "quality": quality,
-                    "time": time,
-                    "efficiency": quality / time  # Quality per second
-                })
-        
-        if len(data_points) < 2:
-            print("[WARN] Skipping efficiency tradeoff (need both modes).")
-            return
-        
-        fig, ax = plt.subplots(figsize=(10, 7))
-        
-        for point in data_points:
-            color = '#2E86AB' if point["mode"] == "Single" else '#F18F01'
-            marker = 'o' if point["mode"] == "Single" else 's'
-            size = point["efficiency"] * 100  # Scale for visibility
-            
-            ax.scatter(point["time"], point["quality"], 
-                      s=size*10, c=color, marker=marker, 
-                      edgecolors='black', linewidths=2, alpha=0.7,
-                      label=f"{point['mode']} (eff: {point['efficiency']:.2f})")
-            
-            # Annotate
-            ax.annotate(point["mode"], 
-                       xy=(point["time"], point["quality"]),
-                       xytext=(10, 10), textcoords='offset points',
-                       fontsize=11, fontweight='bold',
-                       bbox=dict(boxstyle='round', facecolor=color, alpha=0.3))
-        
-        ax.set_xlabel("Execution Time (seconds)", fontsize=12, fontweight='bold')
-        ax.set_ylabel("Quality Score (%)", fontsize=12, fontweight='bold')
-        ax.set_title("Quality vs Speed Tradeoff\n(Bubble size = Efficiency)", 
-                    fontsize=14, fontweight='bold')
-        ax.grid(True, alpha=0.3)
-        ax.legend(loc='best', fontsize=10)
-        
-        plt.tight_layout()
-        plt.savefig(self.output_dir / "efficiency_tradeoff.png", dpi=300, bbox_inches="tight")
-        plt.close()
-        print("[OK] Created efficiency_tradeoff.png")
-
     def create_comprehensive_comparison_table(self):
-        """Create a visual comparison table of key metrics."""
+        """Create visual comparison table."""
         single = self.latest_by_mode.get("single") or {}
         multi = self.latest_by_mode.get("multi") or {}
         
@@ -404,20 +572,12 @@ class VisualizationGenerator:
                 multi.get("execution_time_seconds", 0)
             ),
             "Schema Valid": (
-                "[Y]" if single.get("schema_valid") else "[N]",
-                "[Y]" if multi.get("schema_valid") else "[N]"
+                "Yes" if single.get("schema_valid") else "No",
+                "Yes" if multi.get("schema_valid") else "No"
             ),
-            "KPI Delta": (
-                0,
-                (multi.get("refinement_delta") or {}).get("kpis_delta", 0)
-            ),
-            "Tactics Delta": (
-                0,
-                (multi.get("refinement_delta") or {}).get("tactics_delta", 0)
-            )
         }
         
-        fig, ax = plt.subplots(figsize=(10, 6))
+        fig, ax = plt.subplots(figsize=(10, 5))
         ax.axis('tight')
         ax.axis('off')
         
@@ -426,9 +586,9 @@ class VisualizationGenerator:
         for metric, (single_val, multi_val) in metrics.items():
             if isinstance(single_val, (int, float)) and isinstance(multi_val, (int, float)):
                 delta = multi_val - single_val
-                delta_str = f"{delta:+.1f}" if isinstance(delta, float) else f"{delta:+d}"
-                single_str = f"{single_val:.1f}" if isinstance(single_val, float) else str(single_val)
-                multi_str = f"{multi_val:.1f}" if isinstance(multi_val, float) else str(multi_val)
+                delta_str = f"{delta:+.1f}"
+                single_str = f"{single_val:.1f}"
+                multi_str = f"{multi_val:.1f}"
             else:
                 single_str = str(single_val)
                 multi_str = str(multi_val)
@@ -439,48 +599,44 @@ class VisualizationGenerator:
         table = ax.table(cellText=table_data, cellLoc='center', loc='center',
                         colWidths=[0.3, 0.2, 0.2, 0.2])
         table.auto_set_font_size(False)
-        table.set_fontsize(10)
+        table.set_fontsize(11)
         table.scale(1, 2)
         
-        # Style header row
         for i in range(4):
             table[(0, i)].set_facecolor('#2E86AB')
             table[(0, i)].set_text_props(weight='bold', color='white')
         
-        # Color code changes
-        for i in range(1, len(table_data)):
-            delta_cell = table[(i, 3)]
-            if table_data[i][3] not in ["—", "[Y]", "[N]"]:
-                try:
-                    val = float(table_data[i][3].replace("+", ""))
-                    if val > 0:
-                        delta_cell.set_facecolor('#90EE90')
-                    elif val < 0:
-                        delta_cell.set_facecolor('#FFB6C1')
-                except:
-                    pass
-        
-        plt.title("Comprehensive Comparison: Single vs Multi-Agent", 
-                 fontsize=14, fontweight='bold', pad=20)
+        plt.title("Comparison: Single vs Multi-Agent", fontsize=14, fontweight='bold', pad=20)
         plt.tight_layout()
         plt.savefig(self.output_dir / "comparison_table.png", dpi=300, bbox_inches="tight")
         plt.close()
         print("[OK] Created comparison_table.png")
 
+    # =========================================================================
+    # MAIN GENERATION METHOD
+    # =========================================================================
+
     def generate_all_visualizations(self):
-        """Generate all visualizations."""
+        """Generate all available visualizations."""
         print("\n" + "=" * 70)
-        print("GENERATING ENHANCED VISUALIZATIONS")
+        print("GENERATING VISUALIZATIONS")
         print("=" * 70 + "\n")
 
         viz_methods = [
+            # Standard comparisons
             ("Quality Comparison", self.create_quality_comparison),
             ("Execution Time", self.create_execution_time_chart),
             ("Diversity Lift", self.create_diversity_lift_chart),
-            ("Strategic Elements", self.create_strategic_element_comparison),
             ("Content Diversity Heatmap", self.create_content_diversity_heatmap),
-            ("Efficiency Tradeoff", self.create_efficiency_tradeoff_scatter),
             ("Comparison Table", self.create_comprehensive_comparison_table),
+            
+            # Statistical/multi-run visualizations
+            ("Multi-Run Distribution", self.create_multi_run_distribution),
+            ("Statistical Comparison", self.create_statistical_comparison_chart),
+            
+            # Experiment visualizations
+            ("Ablation Comparison", self.create_ablation_comparison),
+            ("Ordering Comparison", self.create_ordering_comparison),
         ]
         
         for name, method in viz_methods:
@@ -501,14 +657,8 @@ def main():
     try:
         generator = VisualizationGenerator()
         generator.generate_all_visualizations()
-    except FileNotFoundError as e:
-        print(f"\n[ERROR] Error: {e}")
-        print("\n[INFO] To generate visualizations:")
-        print("   1. Run: python main.py (will run multi-agent by default)")
-        print("   2. Run: python main.py --mode single (for single-agent)")
-        print("   3. Then run this script again\n")
     except Exception as e:
-        print(f"\n[ERROR] Unexpected error: {e}")
+        print(f"\n[ERROR] Error: {e}")
         raise
 
 

@@ -1,0 +1,45 @@
+{
+  "dataset_validation": {
+    "status": "error",
+    "error": "Object of type bool is not JSON serializable"
+  },
+  "comparison": {
+    "status": "error",
+    "error": "Object of type bool is not JSON serializable"
+  },
+  "ablation": {
+    "status": "error",
+    "error": "Object of type bool is not JSON serializable"
+  },
+  "ordering": {
+    "status": "completed",
+    "orderings_tested": 6
+  },
+  "llm_judge": {
+    "status": "completed",
+    "overall_score": 3.6,
+    "scores": {
+      "creativity": 4.0,
+      "actionability": 2.0,
+      "relevance": 6.0,
+      "strategic_coherence": 3.0,
+      "practical_feasibility": 3.0
+    }
+  },
+  "failure_analysis": {
+    "status": "completed",
+    "total_failures": 0,
+    "recovery_rate": null
+  },
+  "visualizations": {
+    "status": "completed"
+  },
+  "total_time_seconds": 6981.378460884094,
+  "timestamp": "2025-12-05T21:27:47.585804",
+  "configuration": {
+    "industry": "E-commerce",
+    "target_audience": "Women 25-45",
+    "n_runs": 10,
+    "base_seed": 42
+  }
+}

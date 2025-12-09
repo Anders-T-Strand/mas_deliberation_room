@@ -1,0 +1,361 @@
+{
+  "mode": "multi",
+  "n_runs": 10,
+  "n_successful": 6,
+  "base_seed": 142,
+  "timestamp": "2025-12-05T19:47:13.954961",
+  "statistics": {
+    "rubric": {
+      "mean": 44.333333333333336,
+      "std": 11.97775716345371,
+      "min": 30.0,
+      "max": 57.0,
+      "median": 46.5,
+      "n": 6,
+      "ci_95_lower": 31.763448079985583,
+      "ci_95_upper": 56.90321858668109
+    },
+    "execution_time": {
+      "mean": 66.47863666216533,
+      "std": 7.687263610056123,
+      "min": 55.86964440345764,
+      "max": 76.7939817905426,
+      "median": 68.85429465770721,
+      "n": 6
+    },
+    "rubric_check_rates": {
+      "weaknesses_3_to_5": 100.0,
+      "competitors>=2": 100.0,
+      "kpis_numeric_timebound": 0.0,
+      "tactics_have_roi_rank": 100.0,
+      "budget_consistent": 0.0,
+      "context_mentions_industry_audience": 0.0,
+      "references_sales_data": 33.3,
+      "kpis_have_measurement_methods": 0.0,
+      "has_implementation_phases": 66.7,
+      "has_team_requirements": 66.7
+    }
+  },
+  "individual_runs": [
+    {
+      "agent_mode": "multi",
+      "timestamp": "2025-12-05T19:37:12.892445",
+      "execution_time_seconds": 58.994932651519775,
+      "rubric_percent": 47.0,
+      "rubric_score": 4.7,
+      "schema_valid": false,
+      "schema_issues": [
+        "missing:kpis",
+        "budget_numbers_missing"
+      ],
+      "refinement_delta": {
+        "edit_ratio": 0.6571,
+        "edit_ratio_normalized": 0.5084,
+        "cosine_divergence": 0.6571,
+        "length_ratio": 1.744,
+        "kpis_delta": 0,
+        "tactics_delta": 2,
+        "has_budget_now": true
+      },
+      "grounding_score": {
+        "industry_mentions": 0,
+        "audience_mentions": 0,
+        "data_citations": 8,
+        "grounding_details": [
+          "Data points cited: 8"
+        ],
+        "grounding_score": 40,
+        "grounding_breakdown": {
+          "industry_score": 0,
+          "audience_score": 0,
+          "data_citation_score": 40
+        }
+      },
+      "run_id": 1,
+      "seed": 142,
+      "ablation_config": null,
+      "agent_ordering": null,
+      "rubric_checks": {
+        "weaknesses_3_to_5": true,
+        "competitors>=2": true,
+        "kpis_numeric_timebound": false,
+        "tactics_have_roi_rank": true,
+        "budget_consistent": false,
+        "context_mentions_industry_audience": false,
+        "references_sales_data": false,
+        "kpis_have_measurement_methods": 0.0,
+        "has_implementation_phases": 0.7,
+        "has_team_requirements": 1.0
+      }
+    },
+    {
+      "run_id": 2,
+      "seed": 143,
+      "error": "'dict' object has no attribute 'lower'"
+    },
+    {
+      "agent_mode": "multi",
+      "timestamp": "2025-12-05T19:39:40.584837",
+      "execution_time_seconds": 76.7939817905426,
+      "rubric_percent": 30.0,
+      "rubric_score": 3.0,
+      "schema_valid": false,
+      "schema_issues": [
+        "missing:kpis",
+        "budget_numbers_missing"
+      ],
+      "refinement_delta": null,
+      "grounding_score": {
+        "industry_mentions": 2,
+        "audience_mentions": 0,
+        "data_citations": 8,
+        "grounding_details": [
+          "Industry 'e-commerce' referenced 2 times",
+          "Data points cited: 8"
+        ],
+        "grounding_score": 70,
+        "grounding_breakdown": {
+          "industry_score": 30,
+          "audience_score": 0,
+          "data_citation_score": 40
+        }
+      },
+      "run_id": 3,
+      "seed": 144,
+      "ablation_config": null,
+      "agent_ordering": null,
+      "rubric_checks": {
+        "weaknesses_3_to_5": true,
+        "competitors>=2": true,
+        "kpis_numeric_timebound": false,
+        "tactics_have_roi_rank": true,
+        "budget_consistent": false,
+        "context_mentions_industry_audience": false,
+        "references_sales_data": false,
+        "kpis_have_measurement_methods": 0.0,
+        "has_implementation_phases": 0.0,
+        "has_team_requirements": 0.0
+      }
+    },
+    {
+      "agent_mode": "multi",
+      "timestamp": "2025-12-05T19:40:49.324303",
+      "execution_time_seconds": 68.67705059051514,
+      "rubric_percent": 30.0,
+      "rubric_score": 3.0,
+      "schema_valid": false,
+      "schema_issues": [
+        "missing:kpis",
+        "budget_numbers_missing"
+      ],
+      "refinement_delta": {
+        "edit_ratio": 0.7241,
+        "edit_ratio_normalized": 0.661,
+        "cosine_divergence": 0.7241,
+        "length_ratio": 1.316,
+        "kpis_delta": 0,
+        "tactics_delta": 2,
+        "has_budget_now": true
+      },
+      "grounding_score": {
+        "industry_mentions": 0,
+        "audience_mentions": 0,
+        "data_citations": 7,
+        "grounding_details": [
+          "Data points cited: 7"
+        ],
+        "grounding_score": 40,
+        "grounding_breakdown": {
+          "industry_score": 0,
+          "audience_score": 0,
+          "data_citation_score": 40
+        }
+      },
+      "run_id": 4,
+      "seed": 145,
+      "ablation_config": null,
+      "agent_ordering": null,
+      "rubric_checks": {
+        "weaknesses_3_to_5": true,
+        "competitors>=2": true,
+        "kpis_numeric_timebound": false,
+        "tactics_have_roi_rank": true,
+        "budget_consistent": false,
+        "context_mentions_industry_audience": false,
+        "references_sales_data": false,
+        "kpis_have_measurement_methods": 0.0,
+        "has_implementation_phases": 0.0,
+        "has_team_requirements": 0.0
+      }
+    },
+    {
+      "agent_mode": "multi",
+      "timestamp": "2025-12-05T19:41:45.248766",
+      "execution_time_seconds": 55.86964440345764,
+      "rubric_percent": 57.0,
+      "rubric_score": 5.7,
+      "schema_valid": false,
+      "schema_issues": [
+        "missing:kpis",
+        "budget_numbers_missing"
+      ],
+      "refinement_delta": {
+        "edit_ratio": 0.4412,
+        "edit_ratio_normalized": 0.4018,
+        "cosine_divergence": 0.4412,
+        "length_ratio": 1.197,
+        "kpis_delta": 0,
+        "tactics_delta": 1,
+        "has_budget_now": true
+      },
+      "grounding_score": {
+        "industry_mentions": 0,
+        "audience_mentions": 0,
+        "data_citations": 7,
+        "grounding_details": [
+          "Data points cited: 7"
+        ],
+        "grounding_score": 40,
+        "grounding_breakdown": {
+          "industry_score": 0,
+          "audience_score": 0,
+          "data_citation_score": 40
+        }
+      },
+      "run_id": 5,
+      "seed": 146,
+      "ablation_config": null,
+      "agent_ordering": null,
+      "rubric_checks": {
+        "weaknesses_3_to_5": true,
+        "competitors>=2": true,
+        "kpis_numeric_timebound": false,
+        "tactics_have_roi_rank": true,
+        "budget_consistent": false,
+        "context_mentions_industry_audience": false,
+        "references_sales_data": true,
+        "kpis_have_measurement_methods": 0.0,
+        "has_implementation_phases": 0.7,
+        "has_team_requirements": 1.0
+      }
+    },
+    {
+      "run_id": 6,
+      "seed": 147,
+      "error": "'dict' object has no attribute 'lower'"
+    },
+    {
+      "agent_mode": "multi",
+      "timestamp": "2025-12-05T19:44:00.470558",
+      "execution_time_seconds": 69.5046718120575,
+      "rubric_percent": 56.0,
+      "rubric_score": 5.6,
+      "schema_valid": false,
+      "schema_issues": [
+        "missing:kpis",
+        "budget_numbers_missing"
+      ],
+      "refinement_delta": {
+        "edit_ratio": 0.5789,
+        "edit_ratio_normalized": 0.5174,
+        "cosine_divergence": 0.5789,
+        "length_ratio": 1.308,
+        "kpis_delta": 0,
+        "tactics_delta": 0,
+        "has_budget_now": true
+      },
+      "grounding_score": {
+        "industry_mentions": 0,
+        "audience_mentions": 0,
+        "data_citations": 7,
+        "grounding_details": [
+          "Data points cited: 7"
+        ],
+        "grounding_score": 40,
+        "grounding_breakdown": {
+          "industry_score": 0,
+          "audience_score": 0,
+          "data_citation_score": 40
+        }
+      },
+      "run_id": 7,
+      "seed": 148,
+      "ablation_config": null,
+      "agent_ordering": null,
+      "rubric_checks": {
+        "weaknesses_3_to_5": true,
+        "competitors>=2": true,
+        "kpis_numeric_timebound": false,
+        "tactics_have_roi_rank": true,
+        "budget_consistent": false,
+        "context_mentions_industry_audience": false,
+        "references_sales_data": true,
+        "kpis_have_measurement_methods": 0.0,
+        "has_implementation_phases": 0.6,
+        "has_team_requirements": 1.0
+      }
+    },
+    {
+      "run_id": 8,
+      "seed": 149,
+      "error": "'dict' object has no attribute 'lower'"
+    },
+    {
+      "agent_mode": "multi",
+      "timestamp": "2025-12-05T19:46:07.422682",
+      "execution_time_seconds": 69.03153872489929,
+      "rubric_percent": 46.0,
+      "rubric_score": 4.6,
+      "schema_valid": false,
+      "schema_issues": [
+        "missing:kpis",
+        "budget_numbers_missing"
+      ],
+      "refinement_delta": {
+        "edit_ratio": 0.4778,
+        "edit_ratio_normalized": 0.3885,
+        "cosine_divergence": 0.4778,
+        "length_ratio": 1.446,
+        "kpis_delta": 0,
+        "tactics_delta": 1,
+        "has_budget_now": true
+      },
+      "grounding_score": {
+        "industry_mentions": 2,
+        "audience_mentions": 0,
+        "data_citations": 6,
+        "grounding_details": [
+          "Industry 'e-commerce' referenced 2 times",
+          "Data points cited: 6"
+        ],
+        "grounding_score": 70,
+        "grounding_breakdown": {
+          "industry_score": 30,
+          "audience_score": 0,
+          "data_citation_score": 40
+        }
+      },
+      "run_id": 9,
+      "seed": 150,
+      "ablation_config": null,
+      "agent_ordering": null,
+      "rubric_checks": {
+        "weaknesses_3_to_5": true,
+        "competitors>=2": true,
+        "kpis_numeric_timebound": false,
+        "tactics_have_roi_rank": true,
+        "budget_consistent": false,
+        "context_mentions_industry_audience": false,
+        "references_sales_data": false,
+        "kpis_have_measurement_methods": 0.0,
+        "has_implementation_phases": 0.6,
+        "has_team_requirements": 1.0
+      }
+    },
+    {
+      "run_id": 10,
+      "seed": 151,
+      "error": "'dict' object has no attribute 'lower'"
+    }
+  ]
+}

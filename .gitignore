@@ -1,7 +1,5 @@
 .env
 __pycache__/
 .DS_Store
-.claude
-nul
 uv.lock
 .venv

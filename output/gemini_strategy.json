@@ -89,28 +89,23 @@
     "items": [
       {
         "name": "Instagram Marketing",
-        "percentage": 55,
-        "amount_usd": 319000
+        "percentage": 55
       },
       {
         "name": "Google Ads",
-        "percentage": 20,
-        "amount_usd": 116000
+        "percentage": 20
       },
       {
         "name": "Email Marketing",
-        "percentage": 10,
-        "amount_usd": 58000
+        "percentage": 10
       },
       {
         "name": "Influencer Partnerships",
-        "percentage": 5,
-        "amount_usd": 29000
+        "percentage": 5
       },
       {
         "name": "UGC & Community Engagement",
-        "percentage": 10,
-        "amount_usd": 58000
+        "percentage": 10
       }
     ]
   },
@@ -126,52 +121,5 @@
     "average_order_value": 162.50,
     "customer_lifetime_value": 488.00,
     "monthly_revenue": 1500000
-  },
-  "implementation_phases": [
-    {
-      "phase": "Phase 1: Planning",
-      "duration_weeks": 2,
-      "activities": "Define marketing goals, finalize tech stack for integration, develop detailed action plans for each tactic."
-    },
-    {
-      "phase": "Phase 2: Execution",
-      "duration_weeks": 8,
-      "activities": "Launch all advertising campaigns, initiate SMS and email marketing, and deploy the loyalty program enhancement."
-    },
-    {
-      "phase": "Phase 3: Optimization",
-      "duration_weeks": 4,
-      "activities": "Analyze performance metrics, A/B test tactics, and reallocate budget as needed for maximum ROI."
-    }
-  ],
-  "team_requirements": {
-    "members": [
-      {
-        "role": "Marketing Manager",
-        "responsibilities": "Oversee strategy execution, manage team and budget allocation."
-      },
-      {
-        "role": "Content Creator",
-        "responsibilities": "Generate engaging and on-brand content for social media, email, and website."
-      },
-      {
-        "role": "Data Analyst",
-        "responsibilities": "Track performance metrics and provide insights for optimization."
-      }
-    ]
-  },
-  "risks": [
-    {
-      "risk": "Underperformance of Ad Campaigns",
-      "mitigation": "Conduct thorough audience research and A/B testing to fine-tune targeting and creative."
-    },
-    {
-      "risk": "Low Engagement on New Tactics (e.g., TikTok, UGC)",
-      "mitigation": "Monitor engagement and adapt strategies in real-time, pivoting to more successful content types and formats."
-    },
-    {
-      "risk": "Budget Overrun",
-      "mitigation": "Set strict spending limits per channel and regularly review budget allocation against performance."
-    }
-  ]
+  }
 }

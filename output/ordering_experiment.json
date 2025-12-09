@@ -1,0 +1,1434 @@
+{
+  "experiment": "pipeline_ordering",
+  "timestamp": "2025-12-05T21:27:36.231150",
+  "n_runs_per_ordering": 10,
+  "results_by_ordering": {
+    "default": {
+      "agent_order": [
+        "openai",
+        "claude",
+        "gemini"
+      ],
+      "n_runs": 10,
+      "n_successful": 8,
+      "statistics": {
+        "rubric": {
+          "mean": 35.262499999999996,
+          "std": 30.552574710301773,
+          "min": 0.0,
+          "max": 69.2,
+          "median": 44.85,
+          "n": 8,
+          "ci_95_lower": 9.719908332532896,
+          "ci_95_upper": 60.805091667467096
+        },
+        "execution_time": {
+          "mean": 58.46595886349678,
+          "std": 5.149693362512211,
+          "min": 51.464720010757446,
+          "max": 65.57247877120972,
+          "median": 59.20207619667053,
+          "n": 8
+        },
+        "rubric_check_rates": {
+          "parse_error": 100.0,
+          "weaknesses_3_to_5": 100.0,
+          "competitors>=2": 80.0,
+          "kpis_numeric_timebound": 100.0,
+          "tactics_have_roi_rank": 100.0,
+          "budget_consistent": 20.0,
+          "context_mentions_industry_audience": 0.0,
+          "references_sales_data": 20.0,
+          "kpis_have_measurement_methods": 60.0,
+          "has_implementation_phases": 80.0,
+          "has_team_requirements": 80.0
+        }
+      },
+      "individual_runs": [
+        {
+          "run_id": 1,
+          "error": "'str' object has no attribute 'get'"
+        },
+        {
+          "agent_mode": "multi",
+          "timestamp": "2025-12-05T20:25:25.207956",
+          "execution_time_seconds": 52.806703090667725,
+          "rubric_percent": 0.0,
+          "rubric_score": 0,
+          "schema_valid": false,
+          "schema_issues": [
+            "no_parseable_json"
+          ],
+          "refinement_delta": null,
+          "grounding_score": {
+            "grounding_score": 0
+          },
+          "run_id": 2,
+          "seed": 43,
+          "ablation_config": null,
+          "agent_ordering": "default",
+          "rubric_checks": {
+            "parse_error": true
+          }
+        },
+        {
+          "run_id": 3,
+          "error": "'str' object has no attribute 'get'"
+        },
+        {
+          "agent_mode": "multi",
+          "timestamp": "2025-12-05T20:27:14.753073",
+          "execution_time_seconds": 61.46750450134277,
+          "rubric_percent": 51.2,
+          "rubric_score": 5.12,
+          "schema_valid": false,
+          "schema_issues": [
+            "type:benchmarks expected list",
+            "type:assumptions expected list",
+            "budget_numbers_missing"
+          ],
+          "refinement_delta": {
+            "edit_ratio": 0.6737,
+            "edit_ratio_normalized": 0.519,
+            "cosine_divergence": 0.6737,
+            "length_ratio": 1.774,
+            "kpis_delta": 0,
+            "tactics_delta": 0,
+            "has_budget_now": true
+          },
+          "grounding_score": {
+            "industry_mentions": 2,
+            "audience_mentions": 0,
+            "data_citations": 8,
+            "grounding_details": [
+              "Industry 'e-commerce' referenced 2 times",
+              "Data points cited: 8"
+            ],
+            "grounding_score": 70,
+            "grounding_breakdown": {
+              "industry_score": 30,
+              "audience_score": 0,
+              "data_citation_score": 40
+            }
+          },
+          "run_id": 4,
+          "seed": 45,
+          "ablation_config": null,
+          "agent_ordering": "default",
+          "rubric_checks": {
+            "weaknesses_3_to_5": true,
+            "competitors>=2": true,
+            "kpis_numeric_timebound": true,
+            "tactics_have_roi_rank": true,
+            "budget_consistent": false,
+            "context_mentions_industry_audience": false,
+            "references_sales_data": false,
+            "kpis_have_measurement_methods": 0.0,
+            "has_implementation_phases": 0.3,
+            "has_team_requirements": 0.82
+          }
+        },
+        {
+          "agent_mode": "multi",
+          "timestamp": "2025-12-05T20:28:06.274334",
+          "execution_time_seconds": 51.464720010757446,
+          "rubric_percent": 62.0,
+          "rubric_score": 6.2,
+          "schema_valid": false,
+          "schema_issues": [
+            "type:benchmarks expected list",
+            "type:assumptions expected list",
+            "budget_numbers_missing"
+          ],
+          "refinement_delta": null,
+          "grounding_score": {
+            "industry_mentions": 0,
+            "audience_mentions": 0,
+            "data_citations": 7,
+            "grounding_details": [
+              "Data points cited: 7"
+            ],
+            "grounding_score": 40,
+            "grounding_breakdown": {
+              "industry_score": 0,
+              "audience_score": 0,
+              "data_citation_score": 40
+            }
+          },
+          "run_id": 5,
+          "seed": 46,
+          "ablation_config": null,
+          "agent_ordering": "default",
+          "rubric_checks": {
+            "weaknesses_3_to_5": true,
+            "competitors>=2": true,
+            "kpis_numeric_timebound": true,
+            "tactics_have_roi_rank": true,
+            "budget_consistent": false,
+            "context_mentions_industry_audience": false,
+            "references_sales_data": false,
+            "kpis_have_measurement_methods": 0.9,
+            "has_implementation_phases": 0.3,
+            "has_team_requirements": 1.0
+          }
+        },
+        {
+          "agent_mode": "multi",
+          "timestamp": "2025-12-05T20:29:09.851027",
+          "execution_time_seconds": 63.518760442733765,
+          "rubric_percent": 69.2,
+          "rubric_score": 6.92,
+          "schema_valid": false,
+          "schema_issues": [
+            "type:benchmarks expected list",
+            "type:assumptions expected list",
+            "budget_numbers_missing"
+          ],
+          "refinement_delta": {
+            "edit_ratio": 0.5224,
+            "edit_ratio_normalized": 0.4474,
+            "cosine_divergence": 0.5224,
+            "length_ratio": 1.375,
+            "kpis_delta": 0,
+            "tactics_delta": 1,
+            "has_budget_now": true
+          },
+          "grounding_score": {
+            "industry_mentions": 0,
+            "audience_mentions": 0,
+            "data_citations": 8,
+            "grounding_details": [
+              "Data points cited: 8"
+            ],
+            "grounding_score": 40,
+            "grounding_breakdown": {
+              "industry_score": 0,
+              "audience_score": 0,
+              "data_citation_score": 40
+            }
+          },
+          "run_id": 6,
+          "seed": 47,
+          "ablation_config": null,
+          "agent_ordering": "default",
+          "rubric_checks": {
+            "weaknesses_3_to_5": true,
+            "competitors>=2": true,
+            "kpis_numeric_timebound": true,
+            "tactics_have_roi_rank": true,
+            "budget_consistent": false,
+            "context_mentions_industry_audience": false,
+            "references_sales_data": true,
+            "kpis_have_measurement_methods": 0.8,
+            "has_implementation_phases": 0.3,
+            "has_team_requirements": 0.82
+          }
+        },
+        {
+          "agent_mode": "multi",
+          "timestamp": "2025-12-05T20:30:10.278360",
+          "execution_time_seconds": 60.36026883125305,
+          "rubric_percent": 0.0,
+          "rubric_score": 0,
+          "schema_valid": false,
+          "schema_issues": [
+            "no_parseable_json"
+          ],
+          "refinement_delta": null,
+          "grounding_score": {
+            "grounding_score": 0
+          },
+          "run_id": 7,
+          "seed": 48,
+          "ablation_config": null,
+          "agent_ordering": "default",
+          "rubric_checks": {
+            "parse_error": true
+          }
+        },
+        {
+          "agent_mode": "multi",
+          "timestamp": "2025-12-05T20:31:04.828482",
+          "execution_time_seconds": 54.49335169792175,
+          "rubric_percent": 61.2,
+          "rubric_score": 6.12,
+          "schema_valid": false,
+          "schema_issues": [
+            "type:benchmarks expected list",
+            "type:assumptions expected list"
+          ],
+          "refinement_delta": {
+            "edit_ratio": 0.5636,
+            "edit_ratio_normalized": 0.5536,
+            "cosine_divergence": 0.5636,
+            "length_ratio": 1.05,
+            "kpis_delta": 0,
+            "tactics_delta": 1,
+            "has_budget_now": true
+          },
+          "grounding_score": {
+            "industry_mentions": 2,
+            "audience_mentions": 0,
+            "data_citations": 8,
+            "grounding_details": [
+              "Industry 'e-commerce' referenced 2 times",
+              "Data points cited: 8"
+            ],
+            "grounding_score": 70,
+            "grounding_breakdown": {
+              "industry_score": 30,
+              "audience_score": 0,
+              "data_citation_score": 40
+            }
+          },
+          "run_id": 8,
+          "seed": 49,
+          "ablation_config": null,
+          "agent_ordering": "default",
+          "rubric_checks": {
+            "weaknesses_3_to_5": true,
+            "competitors>=2": true,
+            "kpis_numeric_timebound": true,
+            "tactics_have_roi_rank": true,
+            "budget_consistent": true,
+            "context_mentions_industry_audience": false,
+            "references_sales_data": false,
+            "kpis_have_measurement_methods": 0.0,
+            "has_implementation_phases": 0.3,
+            "has_team_requirements": 0.82
+          }
+        },
+        {
+          "agent_mode": "multi",
+          "timestamp": "2025-12-05T20:32:02.944854",
+          "execution_time_seconds": 58.04388356208801,
+          "rubric_percent": 0.0,
+          "rubric_score": 0,
+          "schema_valid": false,
+          "schema_issues": [
+            "no_parseable_json"
+          ],
+          "refinement_delta": null,
+          "grounding_score": {
+            "grounding_score": 0
+          },
+          "run_id": 9,
+          "seed": 50,
+          "ablation_config": null,
+          "agent_ordering": "default",
+          "rubric_checks": {
+            "parse_error": true
+          }
+        },
+        {
+          "agent_mode": "multi",
+          "timestamp": "2025-12-05T20:33:08.585101",
+          "execution_time_seconds": 65.57247877120972,
+          "rubric_percent": 38.5,
+          "rubric_score": 3.85,
+          "schema_valid": false,
+          "schema_issues": [
+            "type:benchmarks expected list",
+            "budget_numbers_missing"
+          ],
+          "refinement_delta": {
+            "edit_ratio": 0.6034,
+            "edit_ratio_normalized": 0.5742,
+            "cosine_divergence": 0.6034,
+            "length_ratio": 1.146,
+            "kpis_delta": 0,
+            "tactics_delta": 1,
+            "has_budget_now": true
+          },
+          "grounding_score": {
+            "industry_mentions": 0,
+            "audience_mentions": 0,
+            "data_citations": 7,
+            "grounding_details": [
+              "Data points cited: 7"
+            ],
+            "grounding_score": 40,
+            "grounding_breakdown": {
+              "industry_score": 0,
+              "audience_score": 0,
+              "data_citation_score": 40
+            }
+          },
+          "run_id": 10,
+          "seed": 51,
+          "ablation_config": null,
+          "agent_ordering": "default",
+          "rubric_checks": {
+            "weaknesses_3_to_5": true,
+            "competitors>=2": false,
+            "kpis_numeric_timebound": true,
+            "tactics_have_roi_rank": true,
+            "budget_consistent": false,
+            "context_mentions_industry_audience": false,
+            "references_sales_data": false,
+            "kpis_have_measurement_methods": 0.85,
+            "has_implementation_phases": 0.0,
+            "has_team_requirements": 0.0
+          }
+        }
+      ]
+    },
+    "reverse": {
+      "agent_order": [
+        "gemini",
+        "claude",
+        "openai"
+      ],
+      "n_runs": 10,
+      "n_successful": 1,
+      "statistics": {
+        "rubric": {
+          "mean": 0.0,
+          "std": 0.0,
+          "min": 0.0,
+          "max": 0.0,
+          "median": 0.0,
+          "n": 1
+        },
+        "execution_time": {
+          "mean": 84.24815964698792,
+          "std": 0.0,
+          "min": 84.24815964698792,
+          "max": 84.24815964698792,
+          "median": 84.24815964698792,
+          "n": 1
+        },
+        "rubric_check_rates": {
+          "weaknesses_3_to_5": 0.0,
+          "competitors>=2": 0.0,
+          "kpis_numeric_timebound": 0.0,
+          "tactics_have_roi_rank": 0.0,
+          "budget_consistent": 0.0,
+          "context_mentions_industry_audience": 0.0,
+          "references_sales_data": 0.0,
+          "kpis_have_measurement_methods": 0.0,
+          "has_implementation_phases": 0.0,
+          "has_team_requirements": 0.0
+        }
+      },
+      "individual_runs": [
+        {
+          "run_id": 1,
+          "error": "'str' object has no attribute 'get'"
+        },
+        {
+          "run_id": 2,
+          "error": "'str' object has no attribute 'get'"
+        },
+        {
+          "run_id": 3,
+          "error": "'str' object has no attribute 'get'"
+        },
+        {
+          "agent_mode": "multi",
+          "timestamp": "2025-12-05T20:38:53.947945",
+          "execution_time_seconds": 84.24815964698792,
+          "rubric_percent": 0.0,
+          "rubric_score": 0.0,
+          "schema_valid": false,
+          "schema_issues": [
+            "missing:strategy_text",
+            "missing:weaknesses",
+            "missing:kpis",
+            "missing:competitors",
+            "missing:tactics",
+            "missing:budget",
+            "missing:benchmarks",
+            "missing:assumptions",
+            "too_few_competitors",
+            "budget_numbers_missing"
+          ],
+          "refinement_delta": {
+            "edit_ratio": 1.0,
+            "edit_ratio_normalized": 1.0,
+            "cosine_divergence": 1.0,
+            "length_ratio": 0.0,
+            "kpis_delta": -5,
+            "tactics_delta": -5,
+            "has_budget_now": false
+          },
+          "grounding_score": {
+            "industry_mentions": 0,
+            "audience_mentions": 0,
+            "data_citations": 0,
+            "grounding_details": [],
+            "grounding_score": 0,
+            "grounding_breakdown": {
+              "industry_score": 0,
+              "audience_score": 0,
+              "data_citation_score": 0
+            }
+          },
+          "run_id": 4,
+          "seed": 45,
+          "ablation_config": null,
+          "agent_ordering": "reverse",
+          "rubric_checks": {
+            "weaknesses_3_to_5": false,
+            "competitors>=2": false,
+            "kpis_numeric_timebound": false,
+            "tactics_have_roi_rank": false,
+            "budget_consistent": false,
+            "context_mentions_industry_audience": false,
+            "references_sales_data": false,
+            "kpis_have_measurement_methods": 0.0,
+            "has_implementation_phases": 0.0,
+            "has_team_requirements": 0.0
+          }
+        },
+        {
+          "run_id": 5,
+          "error": "'str' object has no attribute 'get'"
+        },
+        {
+          "run_id": 6,
+          "error": "'str' object has no attribute 'get'"
+        },
+        {
+          "run_id": 7,
+          "error": "'str' object has no attribute 'get'"
+        },
+        {
+          "run_id": 8,
+          "error": "'str' object has no attribute 'get'"
+        },
+        {
+          "run_id": 9,
+          "error": "litellm.APIConnectionError: AnthropicException - <!DOCTYPE html>\n<!--[if lt IE 7]> <html class=\"no-js ie6 oldie\" lang=\"en-US\"> <![endif]-->\n<!--[if IE 7]>    <html class=\"no-js ie7 oldie\" lang=\"en-US\"> <![endif]-->\n<!--[if IE 8]>    <html class=\"no-js ie8 oldie\" lang=\"en-US\"> <![endif]-->\n<!--[if gt IE 8]><!--> <html class=\"no-js\" lang=\"en-US\"> <!--<![endif]-->\n<head>\n\n<title> | 500: Internal server error</title>\n<meta charset=\"UTF-8\" />\n<meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\" />\n<meta http-equiv=\"X-UA-Compatible\" content=\"IE=Edge\" />\n<meta name=\"robots\" content=\"noindex, nofollow\" />\n<meta name=\"viewport\" content=\"width=device-width,initial-scale=1\" />\n<link rel=\"stylesheet\" id=\"cf_styles-css\" href=\"/cdn-cgi/styles/main.css\" />\n</head>\n<body>\n<div id=\"cf-wrapper\">\n    <div id=\"cf-error-details\" class=\"p-0\">\n        <header class=\"mx-auto pt-10 lg:pt-6 lg:px-8 w-240 lg:w-full mb-8\">\n            <h1 class=\"inline-block sm:block sm:mb-2 font-light text-60 lg:text-4xl text-black-dark leading-tight mr-2\">\n                <span class=\"inline-block\">Internal server error</span>\n                <span class=\"code-label\">Error code 500</span>\n            </h1>\n            <div>\n                Visit <a href=\"https://www.cloudflare.com/5xx-error-landing?utm_source=errorcode_500&utm_campaign=api.anthropic.com\" target=\"_blank\" rel=\"noopener noreferrer\">cloudflare.com</a> for more information.\n            </div>\n            <div class=\"mt-3\">2025-12-06 02:45:21 UTC</div>\n        </header>\n        <div class=\"my-8 bg-gradient-gray\">\n            <div class=\"w-240 lg:w-full mx-auto\">\n                <div class=\"clearfix md:px-8\">\n                    <div id=\"cf-browser-status\" class=\" relative w-1/3 md:w-full py-15 md:p-0 md:py-8 md:text-left md:border-solid md:border-0 md:border-b md:border-gray-400 overflow-hidden float-left md:float-none text-center\">\n  <div class=\"relative mb-10 md:m-0\">\n    \n    <span class=\"cf-icon-browser block md:hidden h-20 bg-center bg-no-repeat\"></span>\n    <span class=\"cf-icon-ok w-12 h-12 absolute left-1/2 md:left-auto md:right-0 md:top-0 -ml-6 -bottom-4\"></span>\n    \n  </div>\n  <span class=\"md:block w-full truncate\">You</span>\n  <h3 class=\"md:inline-block mt-3 md:mt-0 text-2xl text-gray-600 font-light leading-1.3\">\n  \n    Browser\n  \n  </h3>\n  \n  <span class=\"leading-1.3 text-2xl text-green-success\">Working</span>\n  \n</div>\n                    <div id=\"cf-cloudflare-status\" class=\"cf-error-source relative w-1/3 md:w-full py-15 md:p-0 md:py-8 md:text-left md:border-solid md:border-0 md:border-b md:border-gray-400 overflow-hidden float-left md:float-none text-center\">\n  <div class=\"relative mb-10 md:m-0\">\n    <a href=\"https://www.cloudflare.com/5xx-error-landing?utm_source=errorcode_500&#38;utm_campaign=api.anthropic.com\" target=\"_blank\" rel=\"noopener noreferrer\">\n    <span class=\"cf-icon-cloud block md:hidden h-20 bg-center bg-no-repeat\"></span>\n    <span class=\"cf-icon-error w-12 h-12 absolute left-1/2 md:left-auto md:right-0 md:top-0 -ml-6 -bottom-4\"></span>\n    </a>\n  </div>\n  <span class=\"md:block w-full truncate\">Houston</span>\n  <h3 class=\"md:inline-block mt-3 md:mt-0 text-2xl text-gray-600 font-light leading-1.3\">\n  <a href=\"https://www.cloudflare.com/5xx-error-landing?utm_source=errorcode_500&utm_campaign=api.anthropic.com\" target=\"_blank\" rel=\"noopener noreferrer\">\n    Cloudflare\n  </a>\n  </h3>\n  \n  <span class=\"leading-1.3 text-2xl text-red-error\">Error</span>\n  \n</div>\n                    <div id=\"cf-host-status\" class=\" relative w-1/3 md:w-full py-15 md:p-0 md:py-8 md:text-left md:border-solid md:border-0 md:border-b md:border-gray-400 overflow-hidden float-left md:float-none text-center\">\n  <div class=\"relative mb-10 md:m-0\">\n    \n    <span class=\"cf-icon-server block md:hidden h-20 bg-center bg-no-repeat\"></span>\n    <span class=\"cf-icon-ok w-12 h-12 absolute left-1/2 md:left-auto md:right-0 md:top-0 -ml-6 -bottom-4\"></span>\n    \n  </div>\n  <span class=\"md:block w-full truncate\">api.anthropic.com</span>\n  <h3 class=\"md:inline-block mt-3 md:mt-0 text-2xl text-gray-600 font-light leading-1.3\">\n  \n    Host\n  \n  </h3>\n  \n  <span class=\"leading-1.3 text-2xl text-green-success\">Working</span>\n  \n</div>\n                </div>\n            </div>\n        </div>\n\n        <div class=\"w-240 lg:w-full mx-auto mb-8 lg:px-8\">\n            <div class=\"clearfix\">\n                <div class=\"w-1/2 md:w-full float-left pr-6 md:pb-10 md:pr-0 leading-relaxed\">\n                    <h2 class=\"text-3xl font-normal leading-1.3 mb-4\">What happened?</h2>\n                    <p>There is an internal server error on Cloudflare's network.</p>\n                </div>\n                <div class=\"w-1/2 md:w-full float-left leading-relaxed\">\n                    <h2 class=\"text-3xl font-normal leading-1.3 mb-4\">What can I do?</h2>\n                    <p class=\"mb-6\">Please try again in a few minutes.</p>\n                </div>\n            </div>\n        </div>\n\n        <div class=\"cf-error-footer cf-wrapper w-240 lg:w-full py-10 sm:py-4 sm:px-8 mx-auto text-center sm:text-left border-solid border-0 border-t border-gray-300\">\n    <p class=\"text-13\">\n      <span class=\"cf-footer-item sm:block sm:mb-1\">Cloudflare Ray ID: <strong class=\"font-semibold\">9a9871ff39dffe0e</strong></span>\n      <span class=\"cf-footer-separator sm:hidden\">&bull;</span>\n      <span id=\"cf-footer-item-ip\" class=\"cf-footer-item hidden sm:block sm:mb-1\">\n        Your IP:\n        <button type=\"button\" id=\"cf-footer-ip-reveal\" class=\"cf-footer-ip-reveal-btn\">Click to reveal</button>\n        <span class=\"hidden\" id=\"cf-footer-ip\">71.42.202.165</span>\n        <span class=\"cf-footer-separator sm:hidden\">&bull;</span>\n      </span>\n      <span class=\"cf-footer-item sm:block sm:mb-1\"><span>Performance &amp; security by</span> <a rel=\"noopener noreferrer\" href=\"https://www.cloudflare.com/5xx-error-landing?utm_source=errorcode_500&#38;utm_campaign=api.anthropic.com\" id=\"brand_link\" target=\"_blank\">Cloudflare</a></span>\n      \n    </p>\n    <script>(function(){function d(){var b=a.getElementById(\"cf-footer-item-ip\"),c=a.getElementById(\"cf-footer-ip-reveal\");b&&\"classList\"in b&&(b.classList.remove(\"hidden\"),c.addEventListener(\"click\",function(){c.classList.add(\"hidden\");a.getElementById(\"cf-footer-ip\").classList.remove(\"hidden\")}))}var a=document;document.addEventListener&&a.addEventListener(\"DOMContentLoaded\",d)})();</script>\n  </div><!-- /.error-footer -->\n\n    </div>\n</div>\n</body>\n</html>"
+        },
+        {
+          "run_id": 10,
+          "error": "'str' object has no attribute 'get'"
+        }
+      ]
+    },
+    "claude_first": {
+      "agent_order": [
+        "claude",
+        "openai",
+        "gemini"
+      ],
+      "n_runs": 10,
+      "n_successful": 9,
+      "statistics": {
+        "rubric": {
+          "mean": 20.377777777777776,
+          "std": 28.490909856381286,
+          "min": 0.0,
+          "max": 61.3,
+          "median": 0.0,
+          "n": 9,
+          "ci_95_lower": -1.5222742037370125,
+          "ci_95_upper": 42.277829759292565
+        },
+        "execution_time": {
+          "mean": 53.710648112826874,
+          "std": 9.379552868566808,
+          "min": 39.05947017669678,
+          "max": 68.31531000137329,
+          "median": 53.9527313709259,
+          "n": 9
+        },
+        "rubric_check_rates": {
+          "weaknesses_3_to_5": 33.3,
+          "competitors>=2": 22.2,
+          "kpis_numeric_timebound": 33.3,
+          "tactics_have_roi_rank": 33.3,
+          "budget_consistent": 0.0,
+          "context_mentions_industry_audience": 0.0,
+          "references_sales_data": 11.1,
+          "kpis_have_measurement_methods": 22.2,
+          "has_implementation_phases": 44.4,
+          "has_team_requirements": 44.4
+        }
+      },
+      "individual_runs": [
+        {
+          "agent_mode": "multi",
+          "timestamp": "2025-12-05T20:48:08.124840",
+          "execution_time_seconds": 64.10443615913391,
+          "rubric_percent": 61.3,
+          "rubric_score": 6.13,
+          "schema_valid": false,
+          "schema_issues": [
+            "type:benchmarks expected list",
+            "budget_numbers_missing"
+          ],
+          "refinement_delta": null,
+          "grounding_score": {
+            "industry_mentions": 0,
+            "audience_mentions": 0,
+            "data_citations": 7,
+            "grounding_details": [
+              "Data points cited: 7"
+            ],
+            "grounding_score": 40,
+            "grounding_breakdown": {
+              "industry_score": 0,
+              "audience_score": 0,
+              "data_citation_score": 40
+            }
+          },
+          "run_id": 1,
+          "seed": 42,
+          "ablation_config": null,
+          "agent_ordering": "claude_first",
+          "rubric_checks": {
+            "weaknesses_3_to_5": true,
+            "competitors>=2": true,
+            "kpis_numeric_timebound": true,
+            "tactics_have_roi_rank": true,
+            "budget_consistent": false,
+            "context_mentions_industry_audience": false,
+            "references_sales_data": false,
+            "kpis_have_measurement_methods": 0.83,
+            "has_implementation_phases": 0.3,
+            "has_team_requirements": 1.0
+          }
+        },
+        {
+          "agent_mode": "multi",
+          "timestamp": "2025-12-05T20:48:47.240731",
+          "execution_time_seconds": 39.05947017669678,
+          "rubric_percent": 0.0,
+          "rubric_score": 0.0,
+          "schema_valid": false,
+          "schema_issues": [
+            "missing:strategy_text",
+            "missing:weaknesses",
+            "missing:kpis",
+            "missing:competitors",
+            "missing:tactics",
+            "missing:budget",
+            "missing:benchmarks",
+            "missing:assumptions",
+            "too_few_competitors",
+            "budget_numbers_missing"
+          ],
+          "refinement_delta": {
+            "edit_ratio": 0.0,
+            "edit_ratio_normalized": 0,
+            "cosine_divergence": 0.0,
+            "length_ratio": 0.0,
+            "kpis_delta": 0,
+            "tactics_delta": 0,
+            "has_budget_now": false
+          },
+          "grounding_score": {
+            "industry_mentions": 0,
+            "audience_mentions": 0,
+            "data_citations": 0,
+            "grounding_details": [],
+            "grounding_score": 0,
+            "grounding_breakdown": {
+              "industry_score": 0,
+              "audience_score": 0,
+              "data_citation_score": 0
+            }
+          },
+          "run_id": 2,
+          "seed": 43,
+          "ablation_config": null,
+          "agent_ordering": "claude_first",
+          "rubric_checks": {
+            "weaknesses_3_to_5": false,
+            "competitors>=2": false,
+            "kpis_numeric_timebound": false,
+            "tactics_have_roi_rank": false,
+            "budget_consistent": false,
+            "context_mentions_industry_audience": false,
+            "references_sales_data": false,
+            "kpis_have_measurement_methods": 0.0,
+            "has_implementation_phases": 0.0,
+            "has_team_requirements": 0.0
+          }
+        },
+        {
+          "agent_mode": "multi",
+          "timestamp": "2025-12-05T20:49:35.061410",
+          "execution_time_seconds": 47.76571869850159,
+          "rubric_percent": 9.4,
+          "rubric_score": 0.94,
+          "schema_valid": false,
+          "schema_issues": [
+            "missing:strategy_text",
+            "missing:weaknesses",
+            "missing:kpis",
+            "missing:tactics",
+            "missing:budget",
+            "missing:benchmarks",
+            "missing:assumptions",
+            "budget_numbers_missing"
+          ],
+          "refinement_delta": {
+            "edit_ratio": 0.0,
+            "edit_ratio_normalized": 0,
+            "cosine_divergence": 0.0,
+            "length_ratio": 0.0,
+            "kpis_delta": 0,
+            "tactics_delta": 0,
+            "has_budget_now": false
+          },
+          "grounding_score": {
+            "industry_mentions": 0,
+            "audience_mentions": 0,
+            "data_citations": 0,
+            "grounding_details": [],
+            "grounding_score": 0,
+            "grounding_breakdown": {
+              "industry_score": 0,
+              "audience_score": 0,
+              "data_citation_score": 0
+            }
+          },
+          "run_id": 3,
+          "seed": 44,
+          "ablation_config": null,
+          "agent_ordering": "claude_first",
+          "rubric_checks": {
+            "weaknesses_3_to_5": false,
+            "competitors>=2": false,
+            "kpis_numeric_timebound": false,
+            "tactics_have_roi_rank": false,
+            "budget_consistent": false,
+            "context_mentions_industry_audience": false,
+            "references_sales_data": false,
+            "kpis_have_measurement_methods": 0.0,
+            "has_implementation_phases": 0.3,
+            "has_team_requirements": 0.64
+          }
+        },
+        {
+          "agent_mode": "multi",
+          "timestamp": "2025-12-05T20:50:29.071605",
+          "execution_time_seconds": 53.9527313709259,
+          "rubric_percent": 60.5,
+          "rubric_score": 6.05,
+          "schema_valid": false,
+          "schema_issues": [
+            "type:benchmarks expected list",
+            "type:assumptions expected list",
+            "budget_numbers_missing"
+          ],
+          "refinement_delta": {
+            "edit_ratio": 0.0,
+            "edit_ratio_normalized": 0,
+            "cosine_divergence": 0.0,
+            "length_ratio": 1.0,
+            "kpis_delta": 0,
+            "tactics_delta": 0,
+            "has_budget_now": true
+          },
+          "grounding_score": {
+            "industry_mentions": 6,
+            "audience_mentions": 0,
+            "data_citations": 9,
+            "grounding_details": [
+              "Industry 'e-commerce' referenced 6 times",
+              "Data points cited: 9"
+            ],
+            "grounding_score": 70,
+            "grounding_breakdown": {
+              "industry_score": 30,
+              "audience_score": 0,
+              "data_citation_score": 40
+            }
+          },
+          "run_id": 4,
+          "seed": 45,
+          "ablation_config": null,
+          "agent_ordering": "claude_first",
+          "rubric_checks": {
+            "weaknesses_3_to_5": true,
+            "competitors>=2": false,
+            "kpis_numeric_timebound": true,
+            "tactics_have_roi_rank": true,
+            "budget_consistent": false,
+            "context_mentions_industry_audience": false,
+            "references_sales_data": true,
+            "kpis_have_measurement_methods": 0.75,
+            "has_implementation_phases": 0.3,
+            "has_team_requirements": 1.0
+          }
+        },
+        {
+          "agent_mode": "multi",
+          "timestamp": "2025-12-05T20:51:37.460608",
+          "execution_time_seconds": 68.31531000137329,
+          "rubric_percent": 0.0,
+          "rubric_score": 0.0,
+          "schema_valid": false,
+          "schema_issues": [
+            "missing:strategy_text",
+            "missing:weaknesses",
+            "missing:kpis",
+            "missing:competitors",
+            "missing:tactics",
+            "missing:budget",
+            "missing:benchmarks",
+            "missing:assumptions",
+            "too_few_competitors",
+            "budget_numbers_missing"
+          ],
+          "refinement_delta": null,
+          "grounding_score": {
+            "industry_mentions": 0,
+            "audience_mentions": 0,
+            "data_citations": 0,
+            "grounding_details": [],
+            "grounding_score": 0,
+            "grounding_breakdown": {
+              "industry_score": 0,
+              "audience_score": 0,
+              "data_citation_score": 0
+            }
+          },
+          "run_id": 5,
+          "seed": 46,
+          "ablation_config": null,
+          "agent_ordering": "claude_first",
+          "rubric_checks": {
+            "weaknesses_3_to_5": false,
+            "competitors>=2": false,
+            "kpis_numeric_timebound": false,
+            "tactics_have_roi_rank": false,
+            "budget_consistent": false,
+            "context_mentions_industry_audience": false,
+            "references_sales_data": false,
+            "kpis_have_measurement_methods": 0.0,
+            "has_implementation_phases": 0.0,
+            "has_team_requirements": 0.0
+          }
+        },
+        {
+          "agent_mode": "multi",
+          "timestamp": "2025-12-05T20:52:36.766608",
+          "execution_time_seconds": 59.22278594970703,
+          "rubric_percent": 52.2,
+          "rubric_score": 5.22,
+          "schema_valid": false,
+          "schema_issues": [
+            "type:benchmarks expected list",
+            "budget_numbers_missing"
+          ],
+          "refinement_delta": null,
+          "grounding_score": {
+            "industry_mentions": 4,
+            "audience_mentions": 2,
+            "data_citations": 7,
+            "grounding_details": [
+              "Industry 'e-commerce' referenced 4 times",
+              "Audience referenced 2 times",
+              "Data points cited: 7"
+            ],
+            "grounding_score": 100,
+            "grounding_breakdown": {
+              "industry_score": 30,
+              "audience_score": 30,
+              "data_citation_score": 40
+            }
+          },
+          "run_id": 6,
+          "seed": 47,
+          "ablation_config": null,
+          "agent_ordering": "claude_first",
+          "rubric_checks": {
+            "weaknesses_3_to_5": true,
+            "competitors>=2": true,
+            "kpis_numeric_timebound": true,
+            "tactics_have_roi_rank": true,
+            "budget_consistent": false,
+            "context_mentions_industry_audience": false,
+            "references_sales_data": false,
+            "kpis_have_measurement_methods": 0.0,
+            "has_implementation_phases": 0.4,
+            "has_team_requirements": 0.82
+          }
+        },
+        {
+          "agent_mode": "multi",
+          "timestamp": "2025-12-05T20:53:25.624043",
+          "execution_time_seconds": 48.79896140098572,
+          "rubric_percent": 0.0,
+          "rubric_score": 0.0,
+          "schema_valid": false,
+          "schema_issues": [
+            "missing:strategy_text",
+            "missing:weaknesses",
+            "missing:kpis",
+            "missing:competitors",
+            "missing:tactics",
+            "missing:budget",
+            "missing:benchmarks",
+            "missing:assumptions",
+            "too_few_competitors",
+            "budget_numbers_missing"
+          ],
+          "refinement_delta": {
+            "edit_ratio": 0.0,
+            "edit_ratio_normalized": 0,
+            "cosine_divergence": 0.0,
+            "length_ratio": 0.0,
+            "kpis_delta": 0,
+            "tactics_delta": 0,
+            "has_budget_now": false
+          },
+          "grounding_score": {
+            "industry_mentions": 0,
+            "audience_mentions": 0,
+            "data_citations": 0,
+            "grounding_details": [],
+            "grounding_score": 0,
+            "grounding_breakdown": {
+              "industry_score": 0,
+              "audience_score": 0,
+              "data_citation_score": 0
+            }
+          },
+          "run_id": 7,
+          "seed": 48,
+          "ablation_config": null,
+          "agent_ordering": "claude_first",
+          "rubric_checks": {
+            "weaknesses_3_to_5": false,
+            "competitors>=2": false,
+            "kpis_numeric_timebound": false,
+            "tactics_have_roi_rank": false,
+            "budget_consistent": false,
+            "context_mentions_industry_audience": false,
+            "references_sales_data": false,
+            "kpis_have_measurement_methods": 0.0,
+            "has_implementation_phases": 0.0,
+            "has_team_requirements": 0.0
+          }
+        },
+        {
+          "run_id": 8,
+          "error": "'dict' object has no attribute 'lower'"
+        },
+        {
+          "agent_mode": "multi",
+          "timestamp": "2025-12-05T20:54:46.915763",
+          "execution_time_seconds": 45.42426156997681,
+          "rubric_percent": 0.0,
+          "rubric_score": 0.0,
+          "schema_valid": false,
+          "schema_issues": [
+            "missing:strategy_text",
+            "missing:weaknesses",
+            "missing:kpis",
+            "missing:competitors",
+            "missing:tactics",
+            "missing:budget",
+            "missing:benchmarks",
+            "missing:assumptions",
+            "too_few_competitors",
+            "budget_numbers_missing"
+          ],
+          "refinement_delta": {
+            "edit_ratio": 0.0,
+            "edit_ratio_normalized": 0,
+            "cosine_divergence": 0.0,
+            "length_ratio": 0.0,
+            "kpis_delta": 0,
+            "tactics_delta": 0,
+            "has_budget_now": false
+          },
+          "grounding_score": {
+            "industry_mentions": 0,
+            "audience_mentions": 0,
+            "data_citations": 0,
+            "grounding_details": [],
+            "grounding_score": 0,
+            "grounding_breakdown": {
+              "industry_score": 0,
+              "audience_score": 0,
+              "data_citation_score": 0
+            }
+          },
+          "run_id": 9,
+          "seed": 50,
+          "ablation_config": null,
+          "agent_ordering": "claude_first",
+          "rubric_checks": {
+            "weaknesses_3_to_5": false,
+            "competitors>=2": false,
+            "kpis_numeric_timebound": false,
+            "tactics_have_roi_rank": false,
+            "budget_consistent": false,
+            "context_mentions_industry_audience": false,
+            "references_sales_data": false,
+            "kpis_have_measurement_methods": 0.0,
+            "has_implementation_phases": 0.0,
+            "has_team_requirements": 0.0
+          }
+        },
+        {
+          "agent_mode": "multi",
+          "timestamp": "2025-12-05T20:55:43.725541",
+          "execution_time_seconds": 56.75215768814087,
+          "rubric_percent": 0.0,
+          "rubric_score": 0.0,
+          "schema_valid": false,
+          "schema_issues": [
+            "missing:strategy_text",
+            "missing:weaknesses",
+            "missing:kpis",
+            "missing:competitors",
+            "missing:tactics",
+            "missing:budget",
+            "missing:benchmarks",
+            "missing:assumptions",
+            "too_few_competitors",
+            "budget_numbers_missing"
+          ],
+          "refinement_delta": {
+            "edit_ratio": 0.0,
+            "edit_ratio_normalized": 0,
+            "cosine_divergence": 0.0,
+            "length_ratio": 0.0,
+            "kpis_delta": 0,
+            "tactics_delta": 0,
+            "has_budget_now": false
+          },
+          "grounding_score": {
+            "industry_mentions": 0,
+            "audience_mentions": 0,
+            "data_citations": 0,
+            "grounding_details": [],
+            "grounding_score": 0,
+            "grounding_breakdown": {
+              "industry_score": 0,
+              "audience_score": 0,
+              "data_citation_score": 0
+            }
+          },
+          "run_id": 10,
+          "seed": 51,
+          "ablation_config": null,
+          "agent_ordering": "claude_first",
+          "rubric_checks": {
+            "weaknesses_3_to_5": false,
+            "competitors>=2": false,
+            "kpis_numeric_timebound": false,
+            "tactics_have_roi_rank": false,
+            "budget_consistent": false,
+            "context_mentions_industry_audience": false,
+            "references_sales_data": false,
+            "kpis_have_measurement_methods": 0.0,
+            "has_implementation_phases": 0.0,
+            "has_team_requirements": 0.0
+          }
+        }
+      ]
+    },
+    "claude_last": {
+      "agent_order": [
+        "openai",
+        "gemini",
+        "claude"
+      ],
+      "n_runs": 10,
+      "n_successful": 2,
+      "statistics": {
+        "rubric": {
+          "mean": 15.0,
+          "std": 21.213203435596427,
+          "min": 0.0,
+          "max": 30.0,
+          "median": 15.0,
+          "n": 2,
+          "ci_95_lower": -175.59307104648144,
+          "ci_95_upper": 205.59307104648144
+        },
+        "execution_time": {
+          "mean": 60.71837782859802,
+          "std": 14.305912882247675,
+          "min": 50.602569818496704,
+          "max": 70.83418583869934,
+          "median": 60.71837782859802,
+          "n": 2
+        },
+        "rubric_check_rates": {
+          "parse_error": 100.0,
+          "weaknesses_3_to_5": 100.0,
+          "competitors>=2": 0.0,
+          "kpis_numeric_timebound": 100.0,
+          "tactics_have_roi_rank": 100.0,
+          "budget_consistent": 0.0,
+          "context_mentions_industry_audience": 0.0,
+          "references_sales_data": 0.0,
+          "kpis_have_measurement_methods": 0.0,
+          "has_implementation_phases": 0.0,
+          "has_team_requirements": 0.0
+        }
+      },
+      "individual_runs": [
+        {
+          "run_id": 1,
+          "error": "'str' object has no attribute 'get'"
+        },
+        {
+          "run_id": 2,
+          "error": "'str' object has no attribute 'get'"
+        },
+        {
+          "run_id": 3,
+          "error": "'str' object has no attribute 'get'"
+        },
+        {
+          "run_id": 4,
+          "error": "'str' object has no attribute 'get'"
+        },
+        {
+          "run_id": 5,
+          "error": "'str' object has no attribute 'get'"
+        },
+        {
+          "agent_mode": "multi",
+          "timestamp": "2025-12-05T21:01:46.486715",
+          "execution_time_seconds": 70.83418583869934,
+          "rubric_percent": 0.0,
+          "rubric_score": 0,
+          "schema_valid": false,
+          "schema_issues": [
+            "no_parseable_json"
+          ],
+          "refinement_delta": null,
+          "grounding_score": {
+            "grounding_score": 0
+          },
+          "run_id": 6,
+          "seed": 47,
+          "ablation_config": null,
+          "agent_ordering": "claude_last",
+          "rubric_checks": {
+            "parse_error": true
+          }
+        },
+        {
+          "run_id": 7,
+          "error": "'str' object has no attribute 'get'"
+        },
+        {
+          "run_id": 8,
+          "error": "'str' object has no attribute 'get'"
+        },
+        {
+          "agent_mode": "multi",
+          "timestamp": "2025-12-05T21:04:34.491089",
+          "execution_time_seconds": 50.602569818496704,
+          "rubric_percent": 30.0,
+          "rubric_score": 3.0,
+          "schema_valid": false,
+          "schema_issues": [
+            "type:benchmarks expected list",
+            "budget_numbers_missing"
+          ],
+          "refinement_delta": null,
+          "grounding_score": {
+            "industry_mentions": 0,
+            "audience_mentions": 0,
+            "data_citations": 7,
+            "grounding_details": [
+              "Data points cited: 7"
+            ],
+            "grounding_score": 40,
+            "grounding_breakdown": {
+              "industry_score": 0,
+              "audience_score": 0,
+              "data_citation_score": 40
+            }
+          },
+          "run_id": 9,
+          "seed": 50,
+          "ablation_config": null,
+          "agent_ordering": "claude_last",
+          "rubric_checks": {
+            "weaknesses_3_to_5": true,
+            "competitors>=2": false,
+            "kpis_numeric_timebound": true,
+            "tactics_have_roi_rank": true,
+            "budget_consistent": false,
+            "context_mentions_industry_audience": false,
+            "references_sales_data": false,
+            "kpis_have_measurement_methods": 0.0,
+            "has_implementation_phases": 0.0,
+            "has_team_requirements": 0.0
+          }
+        },
+        {
+          "run_id": 10,
+          "error": "'str' object has no attribute 'get'"
+        }
+      ]
+    },
+    "gemini_first": {
+      "agent_order": [
+        "gemini",
+        "openai",
+        "claude"
+      ],
+      "n_runs": 10,
+      "n_successful": 1,
+      "statistics": {
+        "rubric": {
+          "mean": 9.2,
+          "std": 0.0,
+          "min": 9.2,
+          "max": 9.2,
+          "median": 9.2,
+          "n": 1
+        },
+        "execution_time": {
+          "mean": 92.39716672897339,
+          "std": 0.0,
+          "min": 92.39716672897339,
+          "max": 92.39716672897339,
+          "median": 92.39716672897339,
+          "n": 1
+        },
+        "rubric_check_rates": {
+          "weaknesses_3_to_5": 0.0,
+          "competitors>=2": 0.0,
+          "kpis_numeric_timebound": 0.0,
+          "tactics_have_roi_rank": 0.0,
+          "budget_consistent": 0.0,
+          "context_mentions_industry_audience": 0.0,
+          "references_sales_data": 0.0,
+          "kpis_have_measurement_methods": 0.0,
+          "has_implementation_phases": 100.0,
+          "has_team_requirements": 100.0
+        }
+      },
+      "individual_runs": [
+        {
+          "run_id": 1,
+          "error": "'str' object has no attribute 'get'"
+        },
+        {
+          "run_id": 2,
+          "error": "'str' object has no attribute 'get'"
+        },
+        {
+          "run_id": 3,
+          "error": "'str' object has no attribute 'get'"
+        },
+        {
+          "agent_mode": "multi",
+          "timestamp": "2025-12-05T21:11:06.009054",
+          "execution_time_seconds": 92.39716672897339,
+          "rubric_percent": 9.2,
+          "rubric_score": 0.92,
+          "schema_valid": false,
+          "schema_issues": [
+            "missing:strategy_text",
+            "missing:weaknesses",
+            "missing:kpis",
+            "missing:competitors",
+            "missing:tactics",
+            "missing:benchmarks",
+            "missing:assumptions",
+            "too_few_competitors",
+            "budget_numbers_missing"
+          ],
+          "refinement_delta": {
+            "edit_ratio": 1.0,
+            "edit_ratio_normalized": 1.0,
+            "cosine_divergence": 1.0,
+            "length_ratio": 0.0,
+            "kpis_delta": -6,
+            "tactics_delta": -5,
+            "has_budget_now": true
+          },
+          "grounding_score": {
+            "industry_mentions": 0,
+            "audience_mentions": 0,
+            "data_citations": 0,
+            "grounding_details": [],
+            "grounding_score": 0,
+            "grounding_breakdown": {
+              "industry_score": 0,
+              "audience_score": 0,
+              "data_citation_score": 0
+            }
+          },
+          "run_id": 4,
+          "seed": 45,
+          "ablation_config": null,
+          "agent_ordering": "gemini_first",
+          "rubric_checks": {
+            "weaknesses_3_to_5": false,
+            "competitors>=2": false,
+            "kpis_numeric_timebound": false,
+            "tactics_have_roi_rank": false,
+            "budget_consistent": false,
+            "context_mentions_industry_audience": false,
+            "references_sales_data": false,
+            "kpis_have_measurement_methods": 0.0,
+            "has_implementation_phases": 0.3,
+            "has_team_requirements": 0.62
+          }
+        },
+        {
+          "run_id": 5,
+          "error": "'str' object has no attribute 'get'"
+        },
+        {
+          "run_id": 6,
+          "error": "'str' object has no attribute 'get'"
+        },
+        {
+          "run_id": 7,
+          "error": "'str' object has no attribute 'get'"
+        },
+        {
+          "run_id": 8,
+          "error": "'str' object has no attribute 'get'"
+        },
+        {
+          "run_id": 9,
+          "error": "'str' object has no attribute 'get'"
+        },
+        {
+          "run_id": 10,
+          "error": "'str' object has no attribute 'get'"
+        }
+      ]
+    },
+    "openai_last": {
+      "agent_order": [
+        "claude",
+        "gemini",
+        "openai"
+      ],
+      "n_runs": 10,
+      "n_successful": 1,
+      "statistics": {
+        "rubric": {
+          "mean": 59.8,
+          "std": 0.0,
+          "min": 59.8,
+          "max": 59.8,
+          "median": 59.8,
+          "n": 1
+        },
+        "execution_time": {
+          "mean": 58.389856576919556,
+          "std": 0.0,
+          "min": 58.389856576919556,
+          "max": 58.389856576919556,
+          "median": 58.389856576919556,
+          "n": 1
+        },
+        "rubric_check_rates": {
+          "weaknesses_3_to_5": 100.0,
+          "competitors>=2": 100.0,
+          "kpis_numeric_timebound": 100.0,
+          "tactics_have_roi_rank": 100.0,
+          "budget_consistent": 0.0,
+          "context_mentions_industry_audience": 0.0,
+          "references_sales_data": 0.0,
+          "kpis_have_measurement_methods": 100.0,
+          "has_implementation_phases": 100.0,
+          "has_team_requirements": 100.0
+        }
+      },
+      "individual_runs": [
+        {
+          "agent_mode": "multi",
+          "timestamp": "2025-12-05T21:21:18.787260",
+          "execution_time_seconds": 58.389856576919556,
+          "rubric_percent": 59.8,
+          "rubric_score": 5.98,
+          "schema_valid": false,
+          "schema_issues": [
+            "type:benchmarks expected list",
+            "budget_numbers_missing"
+          ],
+          "refinement_delta": {
+            "edit_ratio": 0.9213,
+            "edit_ratio_normalized": 0.9213,
+            "cosine_divergence": 0.9213,
+            "length_ratio": 0.118,
+            "kpis_delta": -2,
+            "tactics_delta": -4,
+            "has_budget_now": true
+          },
+          "grounding_score": {
+            "industry_mentions": 12,
+            "audience_mentions": 0,
+            "data_citations": 13,
+            "grounding_details": [
+              "Industry 'e-commerce' referenced 12 times",
+              "Data points cited: 13"
+            ],
+            "grounding_score": 70,
+            "grounding_breakdown": {
+              "industry_score": 30,
+              "audience_score": 0,
+              "data_citation_score": 40
+            }
+          },
+          "run_id": 1,
+          "seed": 42,
+          "ablation_config": null,
+          "agent_ordering": "openai_last",
+          "rubric_checks": {
+            "weaknesses_3_to_5": true,
+            "competitors>=2": true,
+            "kpis_numeric_timebound": true,
+            "tactics_have_roi_rank": true,
+            "budget_consistent": false,
+            "context_mentions_industry_audience": false,
+            "references_sales_data": false,
+            "kpis_have_measurement_methods": 0.85,
+            "has_implementation_phases": 0.55,
+            "has_team_requirements": 0.58
+          }
+        },
+        {
+          "run_id": 2,
+          "error": "'str' object has no attribute 'get'"
+        },
+        {
+          "run_id": 3,
+          "error": "litellm.InternalServerError: litellm.InternalServerError: VertexAIException - {\n  \"error\": {\n    \"code\": 503,\n    \"message\": \"The model is overloaded. Please try again later.\",\n    \"status\": \"UNAVAILABLE\"\n  }\n}\n"
+        },
+        {
+          "run_id": 4,
+          "error": "'str' object has no attribute 'get'"
+        },
+        {
+          "run_id": 5,
+          "error": "'str' object has no attribute 'get'"
+        },
+        {
+          "run_id": 6,
+          "error": "litellm.RateLimitError: litellm.RateLimitError: VertexAIException - {\n  \"error\": {\n    \"code\": 429,\n    \"message\": \"You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/usage?tab=rate-limit. \\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 250, model: gemini-2.5-flash\\nPlease retry in 20.110332026s.\",\n    \"status\": \"RESOURCE_EXHAUSTED\",\n    \"details\": [\n      {\n        \"@type\": \"type.googleapis.com/google.rpc.Help\",\n        \"links\": [\n          {\n            \"description\": \"Learn more about Gemini API quotas\",\n            \"url\": \"https://ai.google.dev/gemini-api/docs/rate-limits\"\n          }\n        ]\n      },\n      {\n        \"@type\": \"type.googleapis.com/google.rpc.QuotaFailure\",\n        \"violations\": [\n          {\n            \"quotaMetric\": \"generativelanguage.googleapis.com/generate_content_free_tier_requests\",\n            \"quotaId\": \"GenerateRequestsPerDayPerProjectPerModel-FreeTier\",\n            \"quotaDimensions\": {\n              \"location\": \"global\",\n              \"model\": \"gemini-2.5-flash\"\n            },\n            \"quotaValue\": \"250\"\n          }\n        ]\n      },\n      {\n        \"@type\": \"type.googleapis.com/google.rpc.RetryInfo\",\n        \"retryDelay\": \"20s\"\n      }\n    ]\n  }\n}\n"
+        },
+        {
+          "run_id": 7,
+          "error": "'str' object has no attribute 'get'"
+        },
+        {
+          "run_id": 8,
+          "error": "litellm.RateLimitError: litellm.RateLimitError: VertexAIException - {\n  \"error\": {\n    \"code\": 429,\n    \"message\": \"You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/usage?tab=rate-limit. \\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 250, model: gemini-2.5-flash\\nPlease retry in 54.538244349s.\",\n    \"status\": \"RESOURCE_EXHAUSTED\",\n    \"details\": [\n      {\n        \"@type\": \"type.googleapis.com/google.rpc.Help\",\n        \"links\": [\n          {\n            \"description\": \"Learn more about Gemini API quotas\",\n            \"url\": \"https://ai.google.dev/gemini-api/docs/rate-limits\"\n          }\n        ]\n      },\n      {\n        \"@type\": \"type.googleapis.com/google.rpc.QuotaFailure\",\n        \"violations\": [\n          {\n            \"quotaMetric\": \"generativelanguage.googleapis.com/generate_content_free_tier_requests\",\n            \"quotaId\": \"GenerateRequestsPerDayPerProjectPerModel-FreeTier\",\n            \"quotaDimensions\": {\n              \"model\": \"gemini-2.5-flash\",\n              \"location\": \"global\"\n            },\n            \"quotaValue\": \"250\"\n          }\n        ]\n      },\n      {\n        \"@type\": \"type.googleapis.com/google.rpc.RetryInfo\",\n        \"retryDelay\": \"54s\"\n      }\n    ]\n  }\n}\n"
+        },
+        {
+          "run_id": 9,
+          "error": "litellm.RateLimitError: litellm.RateLimitError: VertexAIException - {\n  \"error\": {\n    \"code\": 429,\n    \"message\": \"You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/usage?tab=rate-limit. \\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 250, model: gemini-2.5-flash\\nPlease retry in 35.523513472s.\",\n    \"status\": \"RESOURCE_EXHAUSTED\",\n    \"details\": [\n      {\n        \"@type\": \"type.googleapis.com/google.rpc.Help\",\n        \"links\": [\n          {\n            \"description\": \"Learn more about Gemini API quotas\",\n            \"url\": \"https://ai.google.dev/gemini-api/docs/rate-limits\"\n          }\n        ]\n      },\n      {\n        \"@type\": \"type.googleapis.com/google.rpc.QuotaFailure\",\n        \"violations\": [\n          {\n            \"quotaMetric\": \"generativelanguage.googleapis.com/generate_content_free_tier_requests\",\n            \"quotaId\": \"GenerateRequestsPerDayPerProjectPerModel-FreeTier\",\n            \"quotaDimensions\": {\n              \"location\": \"global\",\n              \"model\": \"gemini-2.5-flash\"\n            },\n            \"quotaValue\": \"250\"\n          }\n        ]\n      },\n      {\n        \"@type\": \"type.googleapis.com/google.rpc.RetryInfo\",\n        \"retryDelay\": \"35s\"\n      }\n    ]\n  }\n}\n"
+        },
+        {
+          "run_id": 10,
+          "error": "litellm.RateLimitError: litellm.RateLimitError: VertexAIException - {\n  \"error\": {\n    \"code\": 429,\n    \"message\": \"You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/usage?tab=rate-limit. \\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 250, model: gemini-2.5-flash\\nPlease retry in 25.585907224s.\",\n    \"status\": \"RESOURCE_EXHAUSTED\",\n    \"details\": [\n      {\n        \"@type\": \"type.googleapis.com/google.rpc.Help\",\n        \"links\": [\n          {\n            \"description\": \"Learn more about Gemini API quotas\",\n            \"url\": \"https://ai.google.dev/gemini-api/docs/rate-limits\"\n          }\n        ]\n      },\n      {\n        \"@type\": \"type.googleapis.com/google.rpc.QuotaFailure\",\n        \"violations\": [\n          {\n            \"quotaMetric\": \"generativelanguage.googleapis.com/generate_content_free_tier_requests\",\n            \"quotaId\": \"GenerateRequestsPerDayPerProjectPerModel-FreeTier\",\n            \"quotaDimensions\": {\n              \"location\": \"global\",\n              \"model\": \"gemini-2.5-flash\"\n            },\n            \"quotaValue\": \"250\"\n          }\n        ]\n      },\n      {\n        \"@type\": \"type.googleapis.com/google.rpc.RetryInfo\",\n        \"retryDelay\": \"25s\"\n      }\n    ]\n  }\n}\n"
+        }
+      ]
+    }
+  }
+}
